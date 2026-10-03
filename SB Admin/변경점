@@ -1,0 +1,22 @@
+2026-10-04 변경점
+
+- lang 수정
+"en"에서 "ko"로 변경
+
+- footer 수정
+"&copy; 2026 Smart Campus Hub | Web Programming team 16 | SSU AI Software" 문구만 남기고 나머지 삭제
+
+- 사이드 나비게이션바 수정
+MENU 및 하위 4개 항목 생성
+기타 필요 없는 항목에 대해서 index.html에서는 주석 처리, 나머지에서는 삭제
+
+- logout.html 생성
+필요 없을 수도 있지만 혹시 몰라서 일단 만들어는 둠
+
+- settings.html 생성
+들어있는 내용 없음
+
+- blank.html 생성
+들어있는 내용 없음
+
+- 자잘한 문구 수정
