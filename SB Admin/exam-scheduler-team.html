@@ -9,68 +9,99 @@
         <title>시험 스케줄러 | Smart Campus Hub</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
         <link href="css/styles.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
+        <link href="css/frame.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/exam-scheduler-team.css">
 </head>
-    <body class="sb-nav-fixed">
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <body class="sb-nav-fixed sch-frame">
+        <!-- ===== 공통 틀: 상단바 (수정 금지 · 바꿀 땐 팀 공유) ===== -->
+        <nav class="sb-topnav navbar navbar-expand navbar-light">
             <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">Smart Campus Hub</a>
+            <a class="navbar-brand ps-3" href="index.html"><i class="fas fa-graduation-cap"></i>Smart Campus Hub</a>
             <!-- Sidebar Toggle-->
-            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-            <!-- Navbar Search-->
-            <!--
-            <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-                <div class="input-group">
-                    <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-                    <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
-                </div>
+            <button class="btn btn-link btn-sm order-1 order-lg-0 me-3" id="sidebarToggle" href="#!" aria-label="사이드바 열고 닫기"><i class="fas fa-bars"></i></button>
+            <!-- Navbar Search (기능 미정) -->
+            <form class="sch-search d-none d-md-block order-2" role="search" onsubmit="return false;">
+                <span class="sch-field-icon"><i class="fas fa-magnifying-glass"></i></span>
+                <input type="search" placeholder="검색어를 입력하세요..." aria-label="검색" />
             </form>
-            -->
-            <!-- Navbar-->
-            <ul class="navbar-nav ms-auto me-3 me-lg-4">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="settings.html">Settings</a></li>
-                        <li><a class="dropdown-item" href="#!">Activity Log</a></li>
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item" href="login.html">Login</a></li>
-                        <li><a class="dropdown-item" href="register.html">Register</a></li>
-                        <!--
-                        <li><a class="dropdown-item" href="logout.html">Logout</a></li>
-                        -->
-                    </ul>
-                </li>
-            </ul>
+            <!-- Navbar Right -->
+            <div class="d-flex align-items-center gap-2 ms-auto me-3 me-lg-4 order-3">
+                <button type="button" class="sch-icon-btn" aria-label="알림"><i class="far fa-bell"></i><span class="sch-dot"></span></button>
+
+                <!-- 비로그인 상태: 로그인 버튼 + 드롭다운 로그인 패널 -->
+                <div class="dropdown sch-guest-only" id="schGuest">
+                    <button type="button" class="sch-login-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                        <i class="fas fa-user"></i><span>로그인 / 회원가입</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end sch-login-panel">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h6>로그인</h6>
+                            <button type="button" class="btn-close btn-sm" aria-label="닫기" onclick="bootstrap.Dropdown.getInstance(this.closest('.dropdown').querySelector('[data-bs-toggle]')).hide()"></button>
+                        </div>
+                        <form id="schLoginForm" method="post" action="/auth/login" novalidate>
+                            <div class="sch-input">
+                                <span class="sch-field-icon"><i class="far fa-user"></i></span>
+                                <input class="form-control" name="username" type="text" placeholder="아이디를 입력하세요" autocomplete="username" required />
+                            </div>
+                            <div class="sch-input">
+                                <span class="sch-field-icon"><i class="fas fa-lock"></i></span>
+                                <input class="form-control" name="password" type="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password" required />
+                            </div>
+                            <div class="form-check small mb-3">
+                                <input class="form-check-input" type="checkbox" name="remember" id="schRemember" />
+                                <label class="form-check-label" for="schRemember">로그인 상태 유지</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">로그인</button>
+                        </form>
+                        <div class="sch-signup">계정이 없으신가요? <a href="#" data-bs-toggle="modal" data-bs-target="#schRegisterModal">회원가입</a></div>
+                    </div>
+                </div>
+
+                <!-- 로그인 상태: 이름 + 로그아웃 -->
+                <div class="align-items-center gap-2 sch-member-only" id="schMember">
+                    <span class="sch-user"><span class="sch-avatar"><i class="fas fa-user"></i></span><span id="schUserName"></span></span>
+                    <a class="sch-logout-btn sch-logout" href="/auth/logout">로그아웃</a>
+                </div>
+            </div>
         </nav>
         <div id="layoutSidenav">
+            <!-- ===== 공통 틀: 사이드바 (현재 페이지 메뉴는 js/frame.js가 자동으로 파란색 표시) ===== -->
             <div id="layoutSidenav_nav">
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
-                            <div class="sb-sidenav-menu-heading">MENU</div>
+                            <a class="nav-link" href="index.html">
+                                <div class="sb-nav-link-icon"><i class="fas fa-house"></i></div>
+                                홈
+                            </a>
                             <a class="nav-link" href="exam-scheduler-team.html">
-                                <div class="sb-nav-link-icon"></div>
-                                시험 스케줄러
+                                <div class="sb-nav-link-icon"><i class="fas fa-calendar-days"></i></div>
+                                시험 벼락치기 스케줄러
                             </a>
-                            <a class="nav-link" href="#!">
-                                <div class="sb-nav-link-icon"></div>
-                                팀플 워크스페이스
+                            <a class="nav-link" href="workspace.html">
+                                <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                                팀 프로젝트 워크스페이스
                             </a>
-                            <a class="nav-link" href="#!">
-                                <div class="sb-nav-link-icon"></div>
-                                URL 스케너
+                            <a class="nav-link" href="tools.html#url-scanner">
+                                <div class="sb-nav-link-icon"><i class="fas fa-shield-halved"></i></div>
+                                URL 스캐너
                             </a>
-                            <a class="nav-link" href="#!">
-                                <div class="sb-nav-link-icon"></div>
-                                AI톤 체인저
+                            <a class="nav-link" href="tools.html#tone-changer">
+                                <div class="sb-nav-link-icon"><i class="fas fa-envelope-open-text"></i></div>
+                                AI 톤 체인저
+                            </a>
+                            <div class="sch-nav-divider"></div>
+                            <a class="nav-link" href="settings.html">
+                                <div class="sb-nav-link-icon"><i class="fas fa-gear"></i></div>
+                                설정
+                            </a>
+                            <a class="nav-link sch-logout sch-member-only" href="/auth/logout">
+                                <div class="sb-nav-link-icon"><i class="fas fa-right-from-bracket"></i></div>
+                                로그아웃
                             </a>
                         </div>
-                    </div>
-                    <div class="sb-sidenav-footer">
-                        <div class="small">Logged in as:</div>
-                        User Name
                     </div>
                 </nav>
             </div>
@@ -89,6 +120,7 @@
 <div class="focus-layout"><section class="panel timer-stage"><span class="session-pill" id="timerState">시작 준비</span><p id="timerExam" class="muted">나만의 집중 시간</p><h2 id="timerTitle">자유 공부를 시작해 보세요</h2><div class="clock" id="clock" role="timer" aria-label="경과 공부 시간">00:00:00</div><p id="timerTarget">계획에 연결하지 않고도 공부 시간을 기록할 수 있어요.</p><div class="timer-track"><div id="timerProgress"></div></div><div class="actions"><button class="primary" id="freeStart">자유 공부 시작</button><button id="pause" disabled>일시정지</button><button class="finish-button" id="finish" disabled>공부 종료 · 결과 기록</button></div><p class="hint">일시정지한 시간은 제외됩니다. 화면 이동·새로고침 후에도 진행 상황이 유지돼요.</p></section><aside><section class="panel"><h2>이번 공부 가이드</h2><div id="timerGuide"><p>계획 화면에서 공부를 시작하면 해당 시험의 전략을 여기서 확인할 수 있어요.</p></div></section><section class="panel"><h3>집중을 돕는 작은 약속</h3><ul class="explain-list"><li>이번 범위에 필요한 자료만 펼쳐요.</li><li>막히는 부분은 표시하고 넘어가요.</li><li>끝나기 전, 핵심 내용을 떠올려 봐요.</li></ul></section><section class="panel"><h3>다음 공부</h3><p id="timerNext" class="muted">오늘 공부 계획을 먼저 만들어 보세요.</p></section></aside></div></section>
 </main>
                 
+                <!-- ===== 공통 틀: 푸터 ===== -->
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid px-4">
                         <div class="d-flex align-items-center justify-content-between small">
@@ -98,8 +130,57 @@
                 </footer>
             </div>
         </div>
+
+        <!-- ===== 공통 틀: 회원가입 모달 (User 테이블 컬럼 기준, 5단계에서 /auth/register로 전송) ===== -->
+        <div class="modal fade" id="schRegisterModal" tabindex="-1" aria-labelledby="schRegisterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="schRegisterTitle">회원가입</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-danger d-none py-2 small" id="schRegisterError" role="alert"></div>
+                        <form id="schRegisterForm" method="post" action="/auth/register" novalidate>
+                            <div class="row g-2">
+                                <div class="col-6 form-floating mb-2">
+                                    <input class="form-control" id="regName" name="name" type="text" placeholder="이름" autocomplete="name" required />
+                                    <label for="regName">이름</label>
+                                </div>
+                                <div class="col-6 form-floating mb-2">
+                                    <input class="form-control" id="regStudentId" name="student_id" type="text" placeholder="학번" inputmode="numeric" pattern="[0-9]{8}" required />
+                                    <label for="regStudentId">학번 (8자리)</label>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input class="form-control" id="regUsername" name="username" type="text" placeholder="아이디" autocomplete="username" minlength="4" required />
+                                <label for="regUsername">아이디 (4자 이상)</label>
+                            </div>
+                            <div class="form-floating mb-2">
+                                <input class="form-control" id="regEmail" name="email" type="email" placeholder="이메일" autocomplete="email" required />
+                                <label for="regEmail">이메일</label>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6 form-floating mb-3">
+                                    <input class="form-control" id="regPassword" name="password" type="password" placeholder="비밀번호" autocomplete="new-password" minlength="8" required />
+                                    <label for="regPassword">비밀번호 (8자 이상)</label>
+                                </div>
+                                <div class="col-6 form-floating mb-3">
+                                    <input class="form-control" id="regPasswordConfirm" name="password_confirm" type="password" placeholder="비밀번호 확인" autocomplete="new-password" required />
+                                    <label for="regPasswordConfirm">비밀번호 확인</label>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary w-100" type="submit">회원가입</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 공통 스크립트 (순서 유지) ===== -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="js/scripts.js"></script>
+        <script src="js/frame.js"></script>
         <script defer src="js/planner.js"></script>
 <script defer src="js/exam-scheduler.js"></script><script defer src="js/navigation.js"></script>
 <dialog class="scheduler-dialog" id="examDialog"><form id="examForm"><div class="dialoghead"><h2 id="formTitle">시험 등록</h2><button type="button" data-close="examDialog" aria-label="닫기">×</button></div><input type="hidden" id="examId"><label class="field">시험명<input id="examName" required maxlength="100" placeholder="예: 정보기기운용기능사 필기"></label><div class="formgrid"><label class="field">시험 날짜<input id="examDate" type="date" required></label><label class="field">시험 시간<input id="examTime" type="time" required value="13:00"></label></div><fieldset><legend>문제 형식 (복수 선택 가능)</legend><div class="checks"><label><input type="checkbox" name="format" value="객관식">객관식</label><label><input type="checkbox" name="format" value="단답형">단답형</label><label><input type="checkbox" name="format" value="서술형">서술형</label></div></fieldset><fieldset><legend>학습 특성 (복수 선택 가능)</legend><div class="checks"><label><input type="checkbox" name="trait" value="문제은행형">문제은행형</label><label><input type="checkbox" name="trait" value="암기형">암기형</label><label><input type="checkbox" name="trait" value="계산형">계산형</label><label><input type="checkbox" name="trait" value="개념형">개념형</label></div></fieldset><label class="field">현재 전체 준비 상태<select id="readiness"><option value="0">시작 안 함</option><option value="1">조금 공부함</option><option value="2">많이 공부함</option></select></label><h3>시험 범위와 공부 상태</h3><p class="hint">한 번에 공부할 수 있는 작은 단위로 나눠 주세요.</p><div id="scopeRows"></div><button type="button" id="addScope">＋ 범위 추가</button><div class="dialogfoot"><button type="button" data-close="examDialog">취소</button><button type="submit" class="primary">저장하기</button></div></form></dialog>
