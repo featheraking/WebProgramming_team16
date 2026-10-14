@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>시험 스케줄러 | Smart Campus Hub</title>
+        <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/exam-scheduler-team.css">
+</head>
+    <body class="sb-nav-fixed">
+        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+            <!-- Navbar Brand-->
+            <a class="navbar-brand ps-3" href="index.html">Smart Campus Hub</a>
+            <!-- Sidebar Toggle-->
+            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+            <!-- Navbar Search-->
+            <!--
+            <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+                <div class="input-group">
+                    <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                    <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+            -->
+            <!-- Navbar-->
+            <ul class="navbar-nav ms-auto me-3 me-lg-4">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="settings.html">Settings</a></li>
+                        <li><a class="dropdown-item" href="#!">Activity Log</a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item" href="login.html">Login</a></li>
+                        <li><a class="dropdown-item" href="register.html">Register</a></li>
+                        <!--
+                        <li><a class="dropdown-item" href="logout.html">Logout</a></li>
+                        -->
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <div id="layoutSidenav">
+            <div id="layoutSidenav_nav">
+                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                    <div class="sb-sidenav-menu">
+                        <div class="nav">
+                            <div class="sb-sidenav-menu-heading">MENU</div>
+                            <a class="nav-link" href="exam-scheduler-team.html">
+                                <div class="sb-nav-link-icon"></div>
+                                시험 스케줄러
+                            </a>
+                            <a class="nav-link" href="#!">
+                                <div class="sb-nav-link-icon"></div>
+                                팀플 워크스페이스
+                            </a>
+                            <a class="nav-link" href="#!">
+                                <div class="sb-nav-link-icon"></div>
+                                URL 스케너
+                            </a>
+                            <a class="nav-link" href="#!">
+                                <div class="sb-nav-link-icon"></div>
+                                AI톤 체인저
+                            </a>
+                        </div>
+                    </div>
+                    <div class="sb-sidenav-footer">
+                        <div class="small">Logged in as:</div>
+                        User Name
+                    </div>
+                </nav>
+            </div>
+            <div id="layoutSidenav_content">
+                <main class="page" id="schedulerApp">
+<nav class="viewnav" aria-label="시험 스케줄러 화면"><a href="#home" data-route="home">01 <span>시험 대시보드</span></a><a href="#plan" data-route="plan">02 <span>오늘 공부 계획</span></a><a href="#focus" data-route="focus">03 <span>집중 타이머</span></a></nav>
+<div id="runningBanner" class="running-banner hidden"><span>진행 중인 공부가 있어요. 화면을 이동해도 타이머는 유지됩니다.</span><a href="#focus">타이머로 돌아가기 →</a></div>
+<section data-view="home"><div class="pagehead"><div><div class="eyebrow">MY EXAMS</div><h1 tabindex="-1">시험 대시보드</h1><p>가까운 시험부터 확인하고, 오늘의 공부를 준비하세요.</p></div><button class="primary" id="addExam">＋ 시험 등록</button></div>
+<div class="stats"><div class="stat"><small>다가오는 시험</small><strong id="statExams">0개</strong><span>시험 일시가 가까운 순서로 정렬</span></div><div class="stat"><small>완료한 공부 범위</small><strong id="statProgress">0%</strong><span>등록한 범위 개수 기준</span></div><div class="stat"><small>오늘 집중한 시간</small><strong id="statMinutes">0분</strong><span>결과를 저장한 공부 시간</span></div></div>
+<div class="dashboard-grid"><section><div class="sectionhead"><h2>나의 시험</h2><span class="sort-label">↑ 시험 날짜 가까운 순</span></div><p class="hint">예정된 시험이 먼저 표시되고, 종료된 시험은 목록 아래에 모입니다.</p><div id="examList"></div><button id="sample">예시 시험으로 둘러보기</button></section>
+<aside class="dashboard-side"><section class="panel next-exam"><div class="eyebrow">UP NEXT</div><h2>가장 가까운 시험</h2><div id="nearestExam"></div></section><section class="panel action-panel"><h2>오늘, 무엇부터 할까요?</h2><p>공부할 수 있는 시간을 정하면 취약한 범위와 시험 일정을 고려해 순서를 추천해요.</p><a class="button primary full" href="#plan">오늘 공부 계획 만들기 →</a><a class="textlink" href="#focus">계획 없이 자유 공부하기</a></section><section class="panel"><h2>최근 공부 기록</h2><div id="history"></div></section></aside></div></section>
+<section data-view="plan" hidden><div class="pagehead"><div><div class="eyebrow">DAILY STUDY PLAN</div><h1 tabindex="-1">오늘 공부 계획</h1><p>시간을 정하고, 추천 순서를 확인한 뒤 하나씩 시작하세요.</p></div><span class="badge" id="todayLabel"></span></div>
+<div class="planning-grid"><aside><section class="panel"><span class="step-label">STEP 01 · 시간 정하기</span><h2>오늘은 얼마나 가능한가요?</h2><label class="field">오늘 총 공부 가능 시간 (분)<input id="budget" type="number" min="1" max="1440" value="180" step="1"></label><div class="timepresets"><button data-minutes="60">1시간</button><button data-minutes="120">2시간</button><button data-minutes="180">3시간</button><button data-minutes="240">4시간</button></div><dl class="time-summary"><div><dt>오늘 공부한 시간</dt><dd id="planSpent">0분</dd></div><div><dt>추가로 공부 가능한 시간</dt><dd id="planRemaining">180분</dd></div></dl><button class="primary full" id="makePlan">오늘 공부 계획 만들기</button><p class="hint">여러 시험이 하루 시간을 나눠 사용합니다. 다시 만들면 이미 공부한 시간을 제외하고 남은 계획을 갱신해요.</p></section><section class="panel"><h3>계획은 이렇게 정해져요</h3><ol class="explain-list"><li>시험까지 남은 시간을 확인해요.</li><li>모름·애매함 범위를 우선 살펴요.</li><li>시험 유형에 맞게 공부 방법을 추천해요.</li></ol><p class="hint">시험 목록은 날짜순, 공부 순서는 임박도와 취약도를 함께 고려합니다.</p></section></aside>
+<section><span class="step-label">STEP 02 · 전략과 순서 확인</span><div class="focus" id="strategy"></div><div id="sessionFeedback" class="notice hidden" role="status"></div><section class="panel plan-panel"><div class="sectionhead"><h2>오늘의 공부 순서</h2><span id="planCount" class="badge">0개</span></div><div id="plan"></div></section></section></div></section>
+<section data-view="focus" hidden><div class="pagehead"><div><div class="eyebrow">FOCUS SESSION</div><h1 tabindex="-1">지금은, 한 가지에 집중</h1><p>공부를 마치면 이해 상태를 기록해 다음 계획에 반영하세요.</p></div><a class="textlink" href="#plan">← 공부 계획으로</a></div>
+<div class="focus-layout"><section class="panel timer-stage"><span class="session-pill" id="timerState">시작 준비</span><p id="timerExam" class="muted">나만의 집중 시간</p><h2 id="timerTitle">자유 공부를 시작해 보세요</h2><div class="clock" id="clock" role="timer" aria-label="경과 공부 시간">00:00:00</div><p id="timerTarget">계획에 연결하지 않고도 공부 시간을 기록할 수 있어요.</p><div class="timer-track"><div id="timerProgress"></div></div><div class="actions"><button class="primary" id="freeStart">자유 공부 시작</button><button id="pause" disabled>일시정지</button><button class="finish-button" id="finish" disabled>공부 종료 · 결과 기록</button></div><p class="hint">일시정지한 시간은 제외됩니다. 화면 이동·새로고침 후에도 진행 상황이 유지돼요.</p></section><aside><section class="panel"><h2>이번 공부 가이드</h2><div id="timerGuide"><p>계획 화면에서 공부를 시작하면 해당 시험의 전략을 여기서 확인할 수 있어요.</p></div></section><section class="panel"><h3>집중을 돕는 작은 약속</h3><ul class="explain-list"><li>이번 범위에 필요한 자료만 펼쳐요.</li><li>막히는 부분은 표시하고 넘어가요.</li><li>끝나기 전, 핵심 내용을 떠올려 봐요.</li></ul></section><section class="panel"><h3>다음 공부</h3><p id="timerNext" class="muted">오늘 공부 계획을 먼저 만들어 보세요.</p></section></aside></div></section>
+</main>
+                
+                <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted"> &copy; 2026 Smart Campus Hub | Web Programming team 16 | SSU AI Software</div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="js/scripts.js"></script>
+        <script defer src="js/planner.js"></script>
+<script defer src="js/exam-scheduler.js"></script><script defer src="js/navigation.js"></script>
+<dialog class="scheduler-dialog" id="examDialog"><form id="examForm"><div class="dialoghead"><h2 id="formTitle">시험 등록</h2><button type="button" data-close="examDialog" aria-label="닫기">×</button></div><input type="hidden" id="examId"><label class="field">시험명<input id="examName" required maxlength="100" placeholder="예: 정보기기운용기능사 필기"></label><div class="formgrid"><label class="field">시험 날짜<input id="examDate" type="date" required></label><label class="field">시험 시간<input id="examTime" type="time" required value="13:00"></label></div><fieldset><legend>문제 형식 (복수 선택 가능)</legend><div class="checks"><label><input type="checkbox" name="format" value="객관식">객관식</label><label><input type="checkbox" name="format" value="단답형">단답형</label><label><input type="checkbox" name="format" value="서술형">서술형</label></div></fieldset><fieldset><legend>학습 특성 (복수 선택 가능)</legend><div class="checks"><label><input type="checkbox" name="trait" value="문제은행형">문제은행형</label><label><input type="checkbox" name="trait" value="암기형">암기형</label><label><input type="checkbox" name="trait" value="계산형">계산형</label><label><input type="checkbox" name="trait" value="개념형">개념형</label></div></fieldset><label class="field">현재 전체 준비 상태<select id="readiness"><option value="0">시작 안 함</option><option value="1">조금 공부함</option><option value="2">많이 공부함</option></select></label><h3>시험 범위와 공부 상태</h3><p class="hint">한 번에 공부할 수 있는 작은 단위로 나눠 주세요.</p><div id="scopeRows"></div><button type="button" id="addScope">＋ 범위 추가</button><div class="dialogfoot"><button type="button" data-close="examDialog">취소</button><button type="submit" class="primary">저장하기</button></div></form></dialog>
+<dialog class="scheduler-dialog" id="resultDialog"><form id="resultForm"><h2>수고했어요! 공부 결과를 기록해요.</h2><p id="resultSummary"></p><div id="resultStatus"><p>공부한 범위를 지금 얼마나 이해했나요?</p><div class="choice"><label><input type="radio" name="status" value="unknown" checked>🔴 모름</label><label><input type="radio" name="status" value="unsure">🟡 애매함</label><label><input type="radio" name="status" value="done">🟢 완료</label></div></div><p class="hint">저장한 공부 시간과 상태는 다음 계획에 반영돼요.</p><div class="dialogfoot"><button type="submit" class="primary">결과 저장</button></div></form></dialog><div class="message hidden" id="message" role="status"></div>
+</body>
+</html>
