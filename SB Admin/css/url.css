@@ -1,0 +1,45 @@
+/* URL 스캐너 페이지 전용 스타일 */
+
+.scan-title {
+    margin-bottom: 42px;
+    font-size: 64px;
+    font-weight: 800;
+    color: #172238;
+    letter-spacing: -1px;
+}
+
+
+.scan-page {
+    max-width: 900px;
+    margin: 0 auto;
+    margin-top: 150px;
+    font-size: 20px;
+}
+
+.step-num {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    color: white;
+    text-align: center;
+    font-size: 24px;
+}
+
+.step-title {
+    font-size: 24px;
+}
+
+.screenshot-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    border: 2px dashed #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
