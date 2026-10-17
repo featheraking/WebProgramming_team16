@@ -1,4 +1,5 @@
-
+// 일단 프로젝트 카드 정보는 로컬에 저장하게 해놨음
+// 필터링, 정렬 기능, 초대 코드 관련은 추후 추가 예정
 let projects = [];
 
 try {
@@ -34,10 +35,8 @@ function createProjectCard(project) {
             <div class="card h-100 border border-primary border-2 text-black project-card">
                 <div class="card-body">
 
-                    <!-- 프로젝트명 (1줄 제한) -->
-                    <h4 class="project-card-title text-limit-1">프로젝트 이름</h4>
+                    <h4 class="project-card-title text-limit-1"></h4>
 
-                    <!-- 생성/마감 날짜 -->
                     <p class="mb-3">
                         <i class="fas fa-calendar-plus"></i>
                         생성일자: <span class="project-created-at"></span>
@@ -46,19 +45,16 @@ function createProjectCard(project) {
                         마감일: <span class="project-due-date"></span>
                     </p>
 
-                    <!-- 프로젝트 설명란 (2줄 제한) -->
                     <p class="project-card-expl text-limit-2"></p>
 
-                    <!-- 과제/참여자 수 -->
                     <div class="d-flex flex-wrap justify-content-between my-3">
                         <span class="task-count me-3"></span>
                         <span class="member-count me-3"></span>
                         <span></span>
                     </div>
 
-                    <!-- 입장 버튼 -->
                     <div class="d-flex align-items-center justify-content-end mt-auto">
-                        <a class="btn btn-primary px-4 py-2 mt-2">enter</a>
+                        <a class="btn btn-primary px-4 py-2 mt-2">입장</a>
                     </div>
 
                 </div>
