@@ -6,12 +6,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>페이지 이름 | Smart Campus Hub</title>
+        <title>Tone Changer | Smart Campus Hub</title>
         <!-- 공통 CSS (순서 유지) -->
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet" />
         <link href="css/frame.css" rel="stylesheet" />
         <!-- CSS 추가 -->
+         <link href="css/tone.css"  rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body class="sb-nav-fixed sch-frame">
@@ -107,7 +108,81 @@
                 <main>
                     <div class="container-fluid px-4">
                         <!-- ===== 본문 작업 ===== -->
-                        <h1 class="mt-4">페이지 제목</h1>
+                         <div class="tone-page">
+                            <h1 class="tone-title"><i class="fas fa-envelope-open-text me-2"></i>AI 톤 체인저</h1>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h5 class="mb-3">감정 온도</h5>
+
+                                            <div class="d-flex justify-content-between small">
+                                                <span>냉철함</span>
+                                                <span>흥분함</span>
+                                            </div>
+                                            <div class="progress mb-3">
+                                                <div class="progress-bar" style="width: 50%"></div>
+                                            </div>
+
+                                            <div class="d-flex justify-content-between small">
+                                                <span>친근함</span>
+                                                <span>격식적</span>
+                                            </div>
+                                            <div class="progress mb-4">
+                                                <div class="progress-bar" style="width: 50%"></div>
+                                            </div>
+
+                                            <h5 class="mb-3">주의 표현</h5>
+                                            <span class="badge bg-secondary">반말</span>
+                                            <span class="badge bg-secondary">초성 표현</span>
+                                            <span class="badge bg-secondary">이모티콘</span>
+                                            <span class="badge bg-secondary">줄임말</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="tone-wrap mb-3">
+                                        <textarea class="form-control tone-box" placeholder="다듬고 싶은 문장을 입력하세요"></textarea>
+                                        
+                                    </div>
+                                    <div class="tone-wrap">
+                                        <textarea class="form-control tone-box" placeholder="바뀐 문장이 여기에 나와요" readonly></textarea>
+                                        <button class="btn text-secondary tone-copy" type="button"><i class="far fa-copy"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h5 class="mb-3">받는 사람</h5>
+                                            <select class="form-select mb-4">
+                                                <option>교수님</option>
+                                                <option>선배</option>
+                                                <option>팀원</option>
+                                            </select>
+
+                                            <h5 class="mb-3">맞춤법</h5>
+                                            <button class="btn btn-outline-primary w-100 mb-4" type="button">맞춤법 검사</button>
+
+                                            <h5 class="mb-3">톤 변환</h5>
+                                            <button class="btn btn-outline-primary w-100 mb-4" type="button">톤 변환</button>
+
+                                            <h5 class="mb-3">템플릿</h5>
+                                            <div class="accordion" id="templateList">
+                                                <div class="accordion-item">
+                                                    <h2 class="accordion-header">
+                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#template1">과제 문의</button>
+                                                    </h2>
+                                                    <div class="accordion-collapse collapse" id="template1" data-bs-parent="#templateList">
+                                                        <div class="accordion-body">템플릿 내용</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
 
                         <!-- ===== 각자 페이지 본문 끝 ===== -->
                     </div>
@@ -175,5 +250,6 @@
         <script src="js/scripts.js"></script>
         <script src="js/frame.js"></script>
         <!-- JS 추가 -->
+         <script src="js/tone.js"></script>
     </body>
 </html>
