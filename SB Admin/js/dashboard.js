@@ -20,9 +20,9 @@
 
     // icon: Font Awesome 아이콘 이름, tone: blue | green | purple
     const SAMPLE_PROJECTS = [
-        { id: 1, name: '캠퍼스 생활 편의 앱 기획', members: 4, progress: 70, icon: 'fa-laptop', tone: 'green' },
-        { id: 2, name: 'AI 기반 학습 도우미', members: 5, progress: 45, icon: 'fa-chart-column', tone: 'blue' },
-        { id: 3, name: '캠퍼스 보안 시스템', members: 3, progress: 30, icon: 'fa-lightbulb', tone: 'purple' },
+        { id: 1, name: '캠퍼스 생활 편의 앱 기획', members: 4, icon: 'fa-laptop', tone: 'green' },
+        { id: 2, name: 'AI 기반 학습 도우미', members: 5, icon: 'fa-chart-column', tone: 'blue' },
+        { id: 3, name: '캠퍼스 보안 시스템', members: 3, icon: 'fa-lightbulb', tone: 'purple' },
     ];
 
     // 워크스페이스 칸반의 3단 상태: todo | doing | done (내게 배정된 과제만)
@@ -170,20 +170,12 @@
                 <div>
                     <div class="dh-project-name"></div>
                     <div class="dh-project-meta"></div>
-                    <div class="dh-progress">
-                        <div class="dh-progress-track"><div class="dh-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div></div>
-                        <span class="dh-progress-num"></span>
-                    </div>
                 </div>
                 <a class="dh-enter">입장하기</a>`;
             // 사용자 입력이 들어갈 수 있는 값은 textContent로 넣음 (XSS 방지)
             item.querySelector('.fas').classList.add(/^fa-[a-z0-9-]+$/.test(p.icon) ? p.icon : 'fa-folder');
             item.querySelector('.dh-project-name').textContent = p.name;
             item.querySelector('.dh-project-meta').textContent = `팀 프로젝트 · ${p.members}명`;
-            item.querySelector('.dh-progress-num').textContent = `${p.progress}%`;
-            const bar = item.querySelector('.dh-progress-bar');
-            bar.style.width = `${p.progress}%`;
-            bar.setAttribute('aria-valuenow', p.progress);
             item.querySelector('.dh-enter').href = `workspace.html?project=${encodeURIComponent(p.id)}`;
             list.appendChild(item);
         });
