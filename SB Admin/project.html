@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>페이지 이름 | Smart Campus Hub</title>
+    <!-- 공통 CSS (순서 유지) -->
+    <link href="css/styles.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+        rel="stylesheet" />
+    <link href="css/frame.css" rel="stylesheet" />
+    <!-- CSS 추가 -->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="sb-nav-fixed sch-frame">
+    <!-- ===== 상단바 (수정 금지) ===== -->
+    <nav class="sb-topnav navbar navbar-expand navbar-light">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="index.html"><i class="fas fa-graduation-cap"></i>Smart Campus Hub</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-3" id="sidebarToggle" href="#!"
+            aria-label="사이드바 열고 닫기"><i class="fas fa-bars"></i></button>
+        <!-- Navbar Search -->
+        <form class="sch-search d-none d-md-block order-2" role="search" onsubmit="return false;">
+            <span class="sch-field-icon"><i class="fas fa-magnifying-glass"></i></span>
+            <input type="search" placeholder="검색어를 입력하세요..." aria-label="검색" />
+        </form>
+        <!-- Navbar Right -->
+        <div class="d-flex align-items-center gap-2 ms-auto me-3 me-lg-4 order-3">
+            <button type="button" class="sch-icon-btn" aria-label="알림"><i class="far fa-bell"></i><span
+                    class="sch-dot"></span></button>
+
+            <div class="dropdown sch-guest-only" id="schGuest">
+                <button type="button" class="sch-login-btn" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                    aria-expanded="false">
+                    <i class="fas fa-user"></i><span>로그인 / 회원가입</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end sch-login-panel">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h6>로그인</h6>
+                        <button type="button" class="btn-close btn-sm" aria-label="닫기"
+                            onclick="bootstrap.Dropdown.getInstance(this.closest('.dropdown').querySelector('[data-bs-toggle]')).hide()"></button>
+                    </div>
+                    <form id="schLoginForm" method="post" action="/auth/login" novalidate>
+                        <div class="sch-input">
+                            <span class="sch-field-icon"><i class="far fa-user"></i></span>
+                            <input class="form-control" name="username" type="text" placeholder="아이디를 입력하세요"
+                                autocomplete="username" required />
+                        </div>
+                        <div class="sch-input">
+                            <span class="sch-field-icon"><i class="fas fa-lock"></i></span>
+                            <input class="form-control" name="password" type="password" placeholder="비밀번호를 입력하세요"
+                                autocomplete="current-password" required />
+                        </div>
+                        <div class="form-check small mb-3">
+                            <input class="form-check-input" type="checkbox" name="remember" id="schRemember" />
+                            <label class="form-check-label" for="schRemember">로그인 상태 유지</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">로그인</button>
+                    </form>
+                    <div class="sch-signup">계정이 없으신가요? <a href="#" data-bs-toggle="modal"
+                            data-bs-target="#schRegisterModal">회원가입</a></div>
+                </div>
+            </div>
+
+            <div class="align-items-center gap-2 sch-member-only" id="schMember">
+                <span class="sch-user"><span class="sch-avatar"><i class="fas fa-user"></i></span><span
+                        id="schUserName"></span></span>
+                <a class="sch-logout-btn sch-logout" href="/auth/logout">로그아웃</a>
+            </div>
+        </div>
+    </nav>
+    <div id="layoutSidenav">
+        <!-- ===== 사이드바 (수정 금지) ===== -->
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <a class="nav-link" href="index.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-house"></i></div>
+                            홈
+                        </a>
+                        <a class="nav-link" href="exam-scheduler-team.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-calendar-days"></i></div>
+                            시험 벼락치기 스케줄러
+                        </a>
+                        <a class="nav-link" href="workspace.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                            팀 프로젝트 워크스페이스
+                        </a>
+                        <a class="nav-link" href="url.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-shield-halved"></i></div>
+                            URL 스캐너
+                        </a>
+                        <a class="nav-link" href="tone.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-envelope-open-text"></i></div>
+                            AI 톤 체인저
+                        </a>
+                        <div class="sch-nav-divider"></div>
+                        <a class="nav-link" href="settings.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-gear"></i></div>
+                            설정
+                        </a>
+                        <a class="nav-link sch-logout sch-member-only" href="/auth/logout">
+                            <div class="sb-nav-link-icon"><i class="fas fa-right-from-bracket"></i></div>
+                            로그아웃
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <!-- ===== 본문 작업 ===== -->
+
+                    <h1 class="mt-4">프로젝트 예시</h1>
+                    <p>
+                        <i class="fas fa-calendar-plus"></i> 생성일자: 2099-12-31 /
+                        <i class="fas fa-calendar-check"></i> 마감일: 2099-12-31
+                    </p>
+
+                    <div class="card d-flex mb-4">
+                        <p style="margin:15px;">
+                            프로젝트 설명 텍스트
+                        </p>
+                    </div>
+
+
+                    <!-- 과제 목록 컨테이너 -->
+                    <div class="row mb-4" id="task-container">
+                        <div class="col-12">
+                            <div class="card">
+
+                                <!-- 제목 및 생성 버튼 -->
+                                <div class="card-header bg-white">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <h3 class="my-2">과제 목록</h3>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                            data-bs-target="#createTaskModal">
+                                            <i class="fas fa-plus me-1"></i> 과제 생성
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover align-middle">
+
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th scope="col">과제명</th>
+                                                    <th scope="col">담당자</th>
+                                                    <th scope="col">진행 상태</th>
+                                                    <th scope="col">마감일</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="task-list">
+
+                                                <!-- 임시 과제 1 -->
+                                                <tr>
+                                                    <td>
+                                                        <button type="button"
+                                                            class="btn btn-link text-decoration-none fw-bold p-0 text-start"
+                                                            data-bs-toggle="modal" data-bs-target="#taskDetailModal"
+                                                            data-task-id="task3">
+                                                            테스트 과제 C
+                                                        </button>
+                                                    </td>
+                                                    <td>팀원 D</td>
+                                                    <td>
+                                                        <span class="badge bg-primary">진행 중</span>
+                                                    </td>
+                                                    <td>2099-12-31</td>
+                                                </tr>
+
+                                                <!-- 임시 과제 2 -->
+                                                <tr>
+                                                    <td>
+                                                        <button type="button"
+                                                            class="btn btn-link text-decoration-none fw-bold p-0 text-start"
+                                                            data-bs-toggle="modal" data-bs-target="#taskDetailModal"
+                                                            data-task-id="task2">
+                                                            테스트 과제 B
+                                                        </button>
+                                                    </td>
+                                                    <td>팀원 C</td>
+                                                    <td>
+                                                        <span class="badge bg-secondary">미시작</span>
+                                                    </td>
+                                                    <td>2099-12-31</td>
+                                                    <td>
+                                                        <!-- 수정 버튼 → 수정 Modal -->
+                                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                            data-bs-toggle="modal" data-bs-target="#editTaskModal"
+                                                            data-task-id="task1">
+                                                            <i class="fas fa-edit me-1"></i> 수정
+                                                        </button>
+                                                    </td>
+                                                </tr>
+
+                                                <!-- 임시 과제 3 -->
+                                                <tr>
+                                                    <td>
+                                                        <button type="button"
+                                                            class="btn btn-link text-decoration-none fw-bold p-0 text-start"
+                                                            data-bs-toggle="modal" data-bs-target="#taskDetailModal"
+                                                            data-task-id="task1">
+                                                            테스트 과제 A
+                                                        </button>
+                                                    </td>
+                                                    <td>팀원 A 팀원 B</td>
+                                                    <td>
+                                                        <span class="badge bg-success">완료</span>
+                                                    </td>
+                                                    <td>2099-12-31</td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 기록 목록 컨테이너 -->
+                    <div class="card mb-4" id="record-container">
+
+                        <div class="card-header bg-white d-flex align-items-center justify-content-between">
+                            <h3 class="my-2">기록 목록</h3>
+
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#createRecordModal">
+                                <i class="fas fa-plus me-1"></i> 기록 작성
+                            </button>
+                        </div>
+
+                        <div class="card-body">
+
+                            <!-- 기록들이 세로로 배치되는 영역 -->
+                            <div class="d-flex flex-column gap-3" id="record-list">
+
+                                <!-- 상위 기록 카드 -->
+                                <div class="card record-card">
+                                    <div class="card-body">
+
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="mb-2">테스트 기록 A</h5>
+                                            <small class="text-muted">
+                                                2099-12-31 00:00
+                                            </small>
+                                        </div>
+
+                                        <p class="text-muted small mb-3">
+                                            팀원 A
+                                        </p>
+
+                                        <p>
+                                            테스트 기록 내용 A
+                                        </p>
+
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                data-bs-toggle="collapse" data-bs-target="#childRecords1">
+                                                펼치기
+                                            </button>
+
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#editRecordModal">
+                                                    수정
+                                                </button>
+
+                                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#recordHistoryModal">
+                                                    수정 이력
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- 하위 기록 펼치기 영역 -->
+                                        <div class="collapse mt-3" id="childRecords1" data-bs-parent="#record-list">
+
+                                            <hr>
+
+                                            <!-- 하위 기록 작성 -->
+                                            <textarea class="form-control mb-2" rows="3"
+                                                placeholder="하위 기록을 작성하세요"></textarea>
+
+                                            <div class="text-end mb-4">
+                                                <button class="btn btn-primary btn-sm">
+                                                    등록
+                                                </button>
+                                            </div>
+
+
+                                            <!-- 하위 기록 목록 -->
+                                            <div class="child-record-list d-flex flex-column gap-3">
+
+                                                <!-- 하위 기록 1: 일반 기록 -->
+                                                <div class="card child-record-card">
+                                                    <div class="card-body">
+
+                                                        <!-- 작성자 및 작성 시간 -->
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center mb-2">
+                                                            <span class="fw-bold">
+                                                                <i class="fas fa-user me-1"></i> 팀원 A
+                                                            </span>
+                                                            <small class="text-muted">
+                                                                2099-12-31 00:00
+                                                            </small>
+                                                        </div>
+
+                                                        <!-- 하위 기록 내용 -->
+                                                        <p class="mb-3">
+                                                            테스트 내용 A
+                                                        </p>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- 하위 기록 2: 수정된 기록 -->
+                                                <div class="card child-record-card">
+                                                    <div class="card-body">
+
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center mb-2">
+                                                            <span class="fw-bold">
+                                                                <i class="fas fa-user me-1"></i> 팀원 B
+                                                            </span>
+                                                            <small class="text-muted">
+                                                                2099-12-31 00:00
+                                                                <span class="ms-1">(수정됨)</span>
+                                                            </small>
+                                                        </div>
+
+                                                        <p class="mb-3">
+                                                            테스트 내용 B
+                                                        </p>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- 하위 기록 3: 본인이 숨긴 기록 -->
+                                                <div class="card child-record-card">
+                                                    <div class="card-body">
+
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center mb-2">
+                                                            <span class="fw-bold">
+                                                                <i class="fas fa-user me-1"></i> 팀원 C
+                                                            </span>
+                                                            <small class="text-muted">
+                                                                2099-12-31 00:00
+                                                                <span class="badge bg-secondary ms-1">숨김</span>
+                                                            </small>
+                                                        </div>
+
+                                                        <!-- 작성자는 자신의 숨김 기록을 열람 가능 -->
+                                                        <p class="mb-3">
+                                                            테스트 내용 A
+                                                        </p>
+
+                                                        <div class="d-flex justify-content-end gap-2">
+                                                            <button type="button"
+                                                                class="btn btn-outline-secondary btn-sm edit-child-record">
+                                                                <i class="fas fa-edit me-1"></i> 수정
+                                                            </button>
+
+                                                            <button type="button"
+                                                                class="btn btn-outline-secondary btn-sm hide-child-record">
+                                                                <i class="fas fa-eye me-1"></i> 숨김 해제
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- 하위 기록 4: 다른 사용자가 숨긴 기록 -->
+                                                <div class="card child-record-card">
+                                                    <div class="card-body">
+
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center mb-2">
+                                                            <span class="fw-bold">
+                                                                <i class="fas fa-user me-1"></i> 팀원 D
+                                                            </span>
+                                                            <small class="text-muted">
+                                                                2099-12-31 00:00
+                                                            </small>
+                                                        </div>
+
+                                                        <!-- 원문 열람 제한 -->
+                                                        <p class="text-muted mb-0">
+                                                            <i class="fas fa-lock me-1"></i>
+                                                            숨겨진 기록입니다.
+                                                        </p>
+
+                                                        <!-- 수정 및 숨김 버튼 없음 -->
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+
+                                            <div class="text-center mt-3">
+                                                <button class="btn btn-outline-primary btn-sm">
+                                                    더 보기
+                                                </button>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== 각자 페이지 본문 끝 ===== -->
+                </div>
+            </main>
+
+            <!-- ===== 푸터 (수정 금지) ===== -->
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted"> &copy; 2026 Smart Campus Hub | Web Programming team 16 | SSU AI
+                            Software</div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- 과제 생성 Modal -->
+    <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createTaskModalLabel">
+                        새 과제 생성
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <form id="createTaskForm">
+                    <div class="modal-body">
+
+                        <!-- 과제명 -->
+                        <div class="mb-3">
+                            <label for="taskTitle" class="form-label">
+                                과제명
+                            </label>
+                            <input type="text" class="form-control" id="taskTitle" placeholder="새 과제" required
+                                maxlength="100">
+                        </div>
+
+                        <!-- 과제 설명 -->
+                        <div class="mb-3">
+                            <label for="taskDescription" class="form-label">
+                                과제 설명
+                            </label>
+                            <textarea class="form-control" id="taskDescription" rows="5"></textarea>
+                        </div>
+
+                        <!-- 담당자 -->
+                        <div class="mb-3">
+                            <label for="taskAssignees" class="form-label">담당자</label>
+                            <select class="form-select" id="taskAssignees" multiple>
+                                <option value="user1">팀원 A</option>
+                                <option value="user2">팀원 B</option>
+                                <option value="user3">팀원 C</option>
+                                <option value="user4">팀원 D</option>
+                            </select>
+                            <div class="form-text">
+                                Ctrl 키를 누른 상태에서 여러 담당자를 선택할 수 있습니다.
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- 마감일 -->
+                            <div class="col-md-12">
+                                <label for="taskDueDate" class="form-label">마감일</label>
+                                <input type="date" class="form-control" id="taskDueDate">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-primary">
+                            생성
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 과제 상세 조회 Modal -->
+    <div class="modal fade" id="taskDetailModal" tabindex="-1" aria-labelledby="taskDetailModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <!-- Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskDetailModalLabel">
+                        과제 상세 정보
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body">
+
+                    <!-- 과제명 -->
+                    <h4 id="detailTaskTitle" class="mb-3">
+                        과제 상세 예시
+                    </h4>
+
+                    <!-- 진행 상태 -->
+                    <div class="mb-3">
+                        <span class="badge bg-secondary" id="detailTaskStatus">
+                            미시작
+                        </span>
+                    </div>
+
+                    <!-- 과제 설명 -->
+                    <div class="mb-4">
+                        <h5>과제 설명</h5>
+                        <p id="detailTaskDescription" class="mb-0 text-break">
+                            설명 예시
+                        </p>
+                    </div>
+
+                    <hr>
+
+                    <div class="row mb-3">
+                        <!-- 담당자 -->
+                        <div class="col-md-6">
+                            <h6>
+                                <i class="fas fa-users me-1"></i> 담당자
+                            </h6>
+                            <p id="detailTaskAssignees" class="mb-0">
+                                팀원
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <!-- 생성일 -->
+                        <div class="col-md-6">
+                            <h6>
+                                <i class="fas fa-calendar-plus me-1"></i> 생성일
+                            </h6>
+                            <p id="detailTaskCreatedAt" class="mb-0">
+                                2099-12-31
+                            </p>
+                        </div>
+
+                        <!-- 마감일 -->
+                        <div class="col-md-6">
+                            <h6>
+                                <i class="fas fa-calendar-check me-1"></i> 마감일
+                            </h6>
+                            <p id="detailTaskDueDate" class="mb-0">
+                                2099-12-31
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        닫기
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 과제 수정 Modal -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <!-- Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTaskModalLabel">
+                        과제 수정
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <form id="editTaskForm">
+
+                    <div class="modal-body">
+
+                        <!-- 수정할 과제 ID -->
+                        <input type="hidden" id="editTaskId">
+
+                        <!-- 과제명 -->
+                        <div class="mb-3">
+                            <label for="editTaskTitle" class="form-label">
+                                과제명
+                            </label>
+                            <input type="text" class="form-control" id="editTaskTitle" maxlength="100" required>
+                        </div>
+
+                        <!-- 과제 설명 -->
+                        <div class="mb-3">
+                            <label for="editTaskDescription" class="form-label">
+                                과제 설명
+                            </label>
+                            <textarea class="form-control" id="editTaskDescription" rows="4"></textarea>
+                        </div>
+
+                        <!-- 담당자 (복수 선택 가능) -->
+                        <div class="mb-3">
+                            <label for="editTaskAssignees" class="form-label">
+                                담당자
+                            </label>
+                            <select class="form-select" id="editTaskAssignees" multiple>
+                                <option value="user1">팀원 A</option>
+                                <option value="user2">팀원 B</option>
+                                <option value="user3">팀원 C</option>
+                            </select>
+                            <div class="form-text">
+                                Ctrl 키를 누른 상태에서 여러 담당자를 선택할 수 있습니다.
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+
+                            <!-- 마감일 -->
+                            <div class="col-md-6">
+                                <label for="editTaskDueDate" class="form-label">
+                                    마감일
+                                </label>
+                                <input type="date" class="form-control" id="editTaskDueDate">
+                            </div>
+
+                            <!-- 진행 상태 -->
+                            <div class="col-md-6">
+                                <label for="editTaskStatus" class="form-label">
+                                    진행 상태
+                                </label>
+                                <select class="form-select" id="editTaskStatus" required>
+                                    <option value="todo">미시작</option>
+                                    <option value="progress">진행 중</option>
+                                    <option value="done">완료</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            취소
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            변경사항 저장
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 기록 생성 Modal -->
+    <div class="modal fade" id="createRecordModal" tabindex="-1" aria-labelledby="createRecordModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createRecordModalLabel">
+                        새 기록 작성
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <form id="createRecordForm">
+                    <div class="modal-body">
+
+                        <!-- 기록 제목 -->
+                        <div class="mb-3">
+                            <label for="recordTitle" class="form-label">
+                                기록 제목
+                            </label>
+                            <input type="text" class="form-control" id="recordTitle" placeholder="새 기록" maxlength="200"
+                                required>
+                        </div>
+
+                        <!-- 기록 내용 -->
+                        <div class="mb-3">
+                            <label for="recordContent" class="form-label">
+                                기록 내용
+                            </label>
+                            <textarea class="form-control" id="recordContent" rows="6" required></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-primary">
+                            기록 작성
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 기록 수정 Modal -->
+    <div class="modal fade" id="editRecordModal" tabindex="-1" aria-labelledby="editRecordModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editRecordModalLabel">
+                        기록 수정
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <form id="editRecordForm">
+                    <div class="modal-body">
+
+                        <!-- 수정할 기록의 ID -->
+                        <input type="hidden" id="editRecordId">
+
+                        <!-- 기록 제목 -->
+                        <div class="mb-3">
+                            <label for="editRecordTitle" class="form-label">
+                                기록 제목
+                            </label>
+                            <input type="text" class="form-control" id="editRecordTitle" maxlength="200" required>
+                        </div>
+
+                        <!-- 기록 내용 -->
+                        <div class="mb-3">
+                            <label for="editRecordContent" class="form-label">
+                                기록 내용
+                            </label>
+                            <textarea class="form-control" id="editRecordContent" rows="6" required></textarea>
+                        </div>
+
+                        <!-- 숨김 여부 -->
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editRecordIsHidden">
+                            <label class="form-check-label" for="editRecordIsHidden">
+                                이 기록 숨김 처리
+                            </label>
+                        </div>
+
+                        <div class="form-text">
+                            제목이나 내용을 수정하면 이전 내용이 수정 이력에 저장됩니다.
+                            숨김 상태 변경만으로는 수정 이력을 남기지 않습니다.
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-primary">
+                            변경사항 저장
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 기록 수정 이력 Modal -->
+    <div class="modal fade" id="recordHistoryModal" tabindex="-1" aria-labelledby="recordHistoryModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recordHistoryModalLabel">
+                        기록 수정 이력
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- 조회 중인 기록 -->
+                    <h6 id="historyRecordTitle" class="mb-3">
+                        테스트 기록 A
+                    </h6>
+
+                    <!-- 수정 이력 목록 -->
+                    <div id="recordHistoryList" class="d-flex flex-column gap-3">
+
+                        <!-- 임시 수정 이력 1 -->
+                        <div class="card">
+                            <div class="card-body">
+
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-history me-1"></i>
+                                    2099-12-31 00:00 수정
+                                </p>
+
+                                <p class="mb-0">
+                                    테스트 수정 이력
+                                </p>
+
+                            </div>
+                        </div>
+
+                        <!-- 임시 수정 이력 2 -->
+                        <div class="card">
+                            <div class="card-body">
+
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-history me-1"></i>
+                                    2099-12-31 00:00 수정
+                                </p>
+
+                                <p class="mb-0">
+                                    테스트 수정
+                                </p>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        닫기
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 회원가입 모달 (수정 금지) ===== -->
+    <div class="modal fade" id="schRegisterModal" tabindex="-1" aria-labelledby="schRegisterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="schRegisterTitle">회원가입</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger d-none py-2 small" id="schRegisterError" role="alert"></div>
+                    <form id="schRegisterForm" method="post" action="/auth/register" novalidate>
+                        <div class="row g-2">
+                            <div class="col-6 form-floating mb-2">
+                                <input class="form-control" id="regName" name="name" type="text" placeholder="이름"
+                                    autocomplete="name" required />
+                                <label for="regName">이름</label>
+                            </div>
+                            <div class="col-6 form-floating mb-2">
+                                <input class="form-control" id="regStudentId" name="student_id" type="text"
+                                    placeholder="학번" inputmode="numeric" pattern="[0-9]{8}" required />
+                                <label for="regStudentId">학번 (8자리)</label>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input class="form-control" id="regUsername" name="username" type="text" placeholder="아이디"
+                                autocomplete="username" minlength="4" required />
+                            <label for="regUsername">아이디 (4자 이상)</label>
+                        </div>
+                        <div class="form-floating mb-2">
+                            <input class="form-control" id="regEmail" name="email" type="email" placeholder="이메일"
+                                autocomplete="email" required />
+                            <label for="regEmail">이메일</label>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6 form-floating mb-3">
+                                <input class="form-control" id="regPassword" name="password" type="password"
+                                    placeholder="비밀번호" autocomplete="new-password" minlength="8" required />
+                                <label for="regPassword">비밀번호 (8자 이상)</label>
+                            </div>
+                            <div class="col-6 form-floating mb-3">
+                                <input class="form-control" id="regPasswordConfirm" name="password_confirm"
+                                    type="password" placeholder="비밀번호 확인" autocomplete="new-password" required />
+                                <label for="regPasswordConfirm">비밀번호 확인</label>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary w-100" type="submit">회원가입</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 공통 스크립트 (순서 유지) ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/frame.js"></script>
+    <!-- JS 추가 -->
+</body>
+
+</html>
