@@ -189,6 +189,14 @@
                                                             data-task-id="task2">
                                                             테스트 과제 B
                                                         </button>
+
+                                                        <!-- 수정 버튼 → 수정 Modal -->
+                                                        <button type="button"
+                                                            class="btn btn-link btn-sm p-0 text-secondary edit-task-btn"
+                                                            data-bs-toggle="modal" data-bs-target="#editTaskModal"
+                                                            data-task-id="task1" title="과제 수정" aria-label="과제 수정">
+                                                            <i class="fas fa-pen"></i>
+                                                        </button>
                                                     </td>
                                                     <td>팀원 C</td>
                                                     <td>
@@ -196,12 +204,7 @@
                                                     </td>
                                                     <td>2099-12-31</td>
                                                     <td>
-                                                        <!-- 수정 버튼 → 수정 Modal -->
-                                                        <button type="button" class="btn btn-outline-secondary btn-sm"
-                                                            data-bs-toggle="modal" data-bs-target="#editTaskModal"
-                                                            data-task-id="task1">
-                                                            <i class="fas fa-edit me-1"></i> 수정
-                                                        </button>
+
                                                     </td>
                                                 </tr>
 
@@ -488,7 +491,7 @@
                         <!-- 담당자 -->
                         <div class="mb-3">
                             <label for="taskAssignees" class="form-label">담당자</label>
-                            <select class="form-select" id="taskAssignees" multiple>
+                            <select class="form-select" id="taskAssignees" multiple required>
                                 <option value="user1">팀원 A</option>
                                 <option value="user2">팀원 B</option>
                                 <option value="user3">팀원 C</option>
@@ -503,7 +506,7 @@
                             <!-- 마감일 -->
                             <div class="col-md-12">
                                 <label for="taskDueDate" class="form-label">마감일</label>
-                                <input type="date" class="form-control" id="taskDueDate">
+                                <input type="date" class="form-control" id="taskDueDate" required>
                             </div>
                         </div>
 
@@ -644,7 +647,7 @@
                             <label for="editTaskDescription" class="form-label">
                                 과제 설명
                             </label>
-                            <textarea class="form-control" id="editTaskDescription" rows="4"></textarea>
+                            <textarea class="form-control" id="editTaskDescription" rows="5"></textarea>
                         </div>
 
                         <!-- 담당자 (복수 선택 가능) -->
@@ -652,7 +655,7 @@
                             <label for="editTaskAssignees" class="form-label">
                                 담당자
                             </label>
-                            <select class="form-select" id="editTaskAssignees" multiple>
+                            <select class="form-select" id="editTaskAssignees" multiple required>
                                 <option value="user1">팀원 A</option>
                                 <option value="user2">팀원 B</option>
                                 <option value="user3">팀원 C</option>
@@ -669,7 +672,7 @@
                                 <label for="editTaskDueDate" class="form-label">
                                     마감일
                                 </label>
-                                <input type="date" class="form-control" id="editTaskDueDate">
+                                <input type="date" class="form-control" id="editTaskDueDate" required>
                             </div>
 
                             <!-- 진행 상태 -->
