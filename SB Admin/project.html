@@ -15,6 +15,7 @@
     <link href="css/frame.css" rel="stylesheet" />
     <!-- CSS 추가 -->
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <link href="css/project.css" rel="stylesheet" />
 </head>
 
 <body class="sb-nav-fixed sch-frame">
@@ -149,6 +150,57 @@
                                 </div>
 
                                 <div class="card-body">
+
+                                    <!-- 과제 검색 및 필터 -->
+                                    <div class="row g-3 mb-3 align-items-end">
+
+                                        <!-- 과제명 검색 -->
+                                        <div class="col-12 col-lg-5">
+                                            <label for="taskSearch" class="form-label">
+                                                과제명 검색
+                                            </label>
+                                            <input type="search" class="form-control" id="taskSearch"
+                                                placeholder="과제명을 입력하세요">
+                                        </div>
+
+                                        <!-- 담당자 필터 -->
+                                        <div class="col-md-6 col-lg-4">
+                                            <label for="taskAssigneeFilter" class="form-label">
+                                                담당자
+                                            </label>
+                                            <select class="form-select" id="taskAssigneeFilter">
+                                                <option value="all">전체 담당자</option>
+                                                <option value="user1">팀원 A</option>
+                                                <option value="user2">팀원 B</option>
+                                                <option value="user3">팀원 C</option>
+                                                <option value="user4">팀원 D</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- 진행 상태 필터 -->
+                                        <div class="col-md-6 col-lg-3">
+                                            <label for="taskStatusFilter" class="form-label">
+                                                진행 상태
+                                            </label>
+                                            <select class="form-select" id="taskStatusFilter">
+                                                <option value="all">전체 상태</option>
+                                                <option value="todo">미시작</option>
+                                                <option value="progress">진행 중</option>
+                                                <option value="done">완료</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- 필터 초기화 -->
+                                    <div class="d-flex justify-content-end mb-3">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                            id="resetTaskFilters">
+                                            <i class="fas fa-undo me-1"></i>
+                                            초기화
+                                        </button>
+                                    </div>
+
                                     <div class="table-responsive">
                                         <table class="table table-hover align-middle">
 
@@ -599,6 +651,51 @@
                         </div>
 
                     </div>
+
+                    <hr>
+
+                    <!-- 담당자별 기록 카드 -->
+                    <div class="card task-note-card" data-user-id="userA">
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 task-note-author">팀원 A</h6>
+
+                                <!-- 본인에게만 표시 (추후 JS로 구현) -->
+                                <button type="button" class="btn btn-outline-secondary btn-sm edit-task-note">
+                                    <i class="fas fa-pen me-1"></i> 수정
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+
+                            <!-- 읽기 모드와 편집 모드를 JS를 통해 변환 -->
+                            <!-- 읽기 모드 -->
+                            <div class="task-note-view">
+                                <p class="task-note-content mb-0">테스트 과제 내용</p>
+                            </div>
+
+                            <!-- 편집 모드: 기본 숨김 -->
+                            <div class="task-note-edit d-none">
+
+                                <textarea class="form-control task-note-input" rows="4"
+                                    placeholder="작업 내용을 입력하세요..."></textarea>
+
+                                <div class="d-flex justify-content-end gap-2 mt-2">
+
+                                    <button type="button" class="btn btn-secondary btn-sm cancel-task-note">
+                                        취소
+                                    </button>
+
+                                    <button type="button" class="btn btn-primary btn-sm save-task-note">
+                                        저장
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Footer -->
@@ -659,6 +756,7 @@
                                 <option value="user1">팀원 A</option>
                                 <option value="user2">팀원 B</option>
                                 <option value="user3">팀원 C</option>
+                                <option value="user4">팀원 D</option>
                             </select>
                             <div class="form-text">
                                 Ctrl 키를 누른 상태에서 여러 담당자를 선택할 수 있습니다.
@@ -949,6 +1047,8 @@
     <script src="js/scripts.js"></script>
     <script src="js/frame.js"></script>
     <!-- JS 추가 -->
+    <script src="js/project.js"></script>
+
 </body>
 
 </html>
