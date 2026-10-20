@@ -120,7 +120,29 @@
                 <div class="container-fluid px-4">
                     <!-- ===== 본문 작업 ===== -->
 
-                    <h1 class="mt-4">프로젝트 예시</h1>
+
+                    <!-- 프로젝트명 및 설정 버튼 -->
+                    <div class="d-flex justify-content-between align-items-center mt-4 mb-2 gap-3">
+
+                        <h1 class="mb-0" id="projectTitle">
+                            프로젝트 예시
+                        </h1>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- 프로젝트 페이지 나가기 -->
+                            <a href="workspace.html" class="btn btn-primary"><i class="fas fa-sign-out"></i> 돌아가기</a>
+
+                            <!-- 설정 -->
+                            <button type="button" class="btn btn-outline-secondary" id="projectSettingsButton"
+                                data-bs-toggle="modal" data-bs-target="#projectSettingsModal" title="프로젝트 설정"
+                                aria-label="프로젝트 설정">
+                                <i class="fas fa-gear"></i>
+                            </button>
+                        </div>
+
+
+                    </div>
+
                     <p>
                         <i class="fas fa-calendar-plus"></i> 생성일자: 2099-12-31 /
                         <i class="fas fa-calendar-check"></i> 마감일: 2099-12-31
@@ -246,7 +268,7 @@
                                                         <button type="button"
                                                             class="btn btn-link btn-sm p-0 text-secondary edit-task-btn"
                                                             data-bs-toggle="modal" data-bs-target="#editTaskModal"
-                                                            data-task-id="task1" title="과제 수정" aria-label="과제 수정">
+                                                            data-task-id="task2" title="과제 수정" aria-label="과제 수정">
                                                             <i class="fas fa-pen"></i>
                                                         </button>
                                                     </td>
@@ -255,9 +277,6 @@
                                                         <span class="badge bg-secondary">미시작</span>
                                                     </td>
                                                     <td>2099-12-31</td>
-                                                    <td>
-
-                                                    </td>
                                                 </tr>
 
                                                 <!-- 임시 과제 3 -->
@@ -301,10 +320,10 @@
 
                         <div class="card-body">
 
-                            <!-- 기록들이 세로로 배치되는 영역 -->
+                            <!-- 기록 카드들이 배치되는 영역 -->
                             <div class="d-flex flex-column gap-3" id="record-list">
+                                <!-- 여기서부터 배치 -->
 
-                                <!-- 상위 기록 카드 -->
                                 <div class="card record-card">
                                     <div class="card-body">
 
@@ -362,13 +381,13 @@
                                             <div class="child-record-list d-flex flex-column gap-3">
 
                                                 <!-- 하위 기록 1: 일반 기록 -->
-                                                <div class="card child-record-card">
+                                                <div class="card child-record-card" data-child-id="child4">
                                                     <div class="card-body">
 
                                                         <!-- 작성자 및 작성 시간 -->
                                                         <div
                                                             class="d-flex justify-content-between align-items-center mb-2">
-                                                            <span class="fw-bold">
+                                                            <span class="fw-bold child-record-author">
                                                                 <i class="fas fa-user me-1"></i> 팀원 A
                                                             </span>
                                                             <small class="text-muted">
@@ -377,42 +396,38 @@
                                                         </div>
 
                                                         <!-- 하위 기록 내용 -->
-                                                        <p class="mb-3">
-                                                            테스트 내용 A
-                                                        </p>
+                                                        <p class="child-record-content mb-3">테스트 내용 A</p>
 
                                                     </div>
                                                 </div>
 
                                                 <!-- 하위 기록 2: 수정된 기록 -->
-                                                <div class="card child-record-card">
+                                                <div class="card child-record-card" data-child-id="child3">
                                                     <div class="card-body">
 
                                                         <div
                                                             class="d-flex justify-content-between align-items-center mb-2">
-                                                            <span class="fw-bold">
+                                                            <span class="fw-bold child-record-author">
                                                                 <i class="fas fa-user me-1"></i> 팀원 B
                                                             </span>
                                                             <small class="text-muted">
                                                                 2099-12-31 00:00
-                                                                <span class="ms-1">(수정됨)</span>
+                                                                <span class="child-record-edited ms-1">(수정됨)</span>
                                                             </small>
                                                         </div>
 
-                                                        <p class="mb-3">
-                                                            테스트 내용 B
-                                                        </p>
+                                                        <p class="child-record-content mb-3">테스트 내용 B</p>
 
                                                     </div>
                                                 </div>
 
                                                 <!-- 하위 기록 3: 본인이 숨긴 기록 -->
-                                                <div class="card child-record-card">
+                                                <div class="card child-record-card" data-child-id="child2">
                                                     <div class="card-body">
 
                                                         <div
                                                             class="d-flex justify-content-between align-items-center mb-2">
-                                                            <span class="fw-bold">
+                                                            <span class="fw-bold child-record-author">
                                                                 <i class="fas fa-user me-1"></i> 팀원 C
                                                             </span>
                                                             <small class="text-muted">
@@ -421,33 +436,54 @@
                                                             </small>
                                                         </div>
 
-                                                        <!-- 작성자는 자신의 숨김 기록을 열람 가능 -->
-                                                        <p class="mb-3">
-                                                            테스트 내용 A
-                                                        </p>
+                                                        <!-- 작성자에게만 표시 -->
+                                                        <!-- 읽기 모드 -->
+                                                        <div class="child-record-view">
+                                                            <p class="child-record-content mb-3">테스트 내용 C</p>
 
-                                                        <div class="d-flex justify-content-end gap-2">
-                                                            <button type="button"
-                                                                class="btn btn-outline-secondary btn-sm edit-child-record">
-                                                                <i class="fas fa-edit me-1"></i> 수정
-                                                            </button>
+                                                            
+                                                            <div class="d-flex justify-content-end gap-2">
+                                                                <button type="button"
+                                                                    class="btn btn-outline-secondary btn-sm edit-child-record">
+                                                                    <i class="fas fa-pen me-1"></i> 수정
+                                                                </button>
 
-                                                            <button type="button"
-                                                                class="btn btn-outline-secondary btn-sm hide-child-record">
-                                                                <i class="fas fa-eye me-1"></i> 숨김 해제
-                                                            </button>
+                                                                <button type="button"
+                                                                    class="btn btn-outline-secondary btn-sm hide-child-record">
+                                                                    <i class="fas fa-eye-slash me-1"></i> 숨김
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- 수정 모드: 기본 숨김 -->
+                                                        <div class="child-record-edit d-none">
+
+                                                            <textarea class="form-control child-record-input" rows="4"
+                                                                placeholder="하위 기록 내용을 입력하세요" required></textarea>
+
+                                                            <div class="d-flex justify-content-end gap-2 mt-2">
+                                                                <button type="button"
+                                                                    class="btn btn-secondary btn-sm cancel-child-record">
+                                                                    취소
+                                                                </button>
+
+                                                                <button type="button"
+                                                                    class="btn btn-primary btn-sm save-child-record">
+                                                                    저장
+                                                                </button>
+                                                            </div>
                                                         </div>
 
                                                     </div>
                                                 </div>
 
                                                 <!-- 하위 기록 4: 다른 사용자가 숨긴 기록 -->
-                                                <div class="card child-record-card">
+                                                <div class="card child-record-card" data-child-id="child1">
                                                     <div class="card-body">
 
                                                         <div
                                                             class="d-flex justify-content-between align-items-center mb-2">
-                                                            <span class="fw-bold">
+                                                            <span class="fw-bold child-record-author">
                                                                 <i class="fas fa-user me-1"></i> 팀원 D
                                                             </span>
                                                             <small class="text-muted">
@@ -456,15 +492,159 @@
                                                         </div>
 
                                                         <!-- 원문 열람 제한 -->
-                                                        <p class="text-muted mb-0">
-                                                            <i class="fas fa-lock me-1"></i>
-                                                            숨겨진 기록입니다.
-                                                        </p>
+                                                        <p class="child-record-content text-muted mb-0"><i class="fas fa-lock me-1"></i> 숨겨진 기록입니다.</p>
 
                                                         <!-- 수정 및 숨김 버튼 없음 -->
 
                                                     </div>
                                                 </div>
+
+                                            </div>
+
+
+                                            <div class="text-center mt-3">
+                                                <button class="btn btn-outline-primary btn-sm">
+                                                    더 보기
+                                                </button>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="card record-card">
+                                    <div class="card-body">
+
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="mb-2">테스트 기록 B</h5>
+                                            <small class="text-muted">
+                                                2099-12-31 00:00
+                                            </small>
+                                        </div>
+
+                                        <p class="text-muted small mb-3">
+                                            팀원 B
+                                        </p>
+
+                                        <p>
+                                            테스트 기록 내용 B
+                                        </p>
+
+                                        <div class="d-flex justify-content-between">
+                                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                                data-bs-toggle="collapse" data-bs-target="#childRecords2">
+                                                펼치기
+                                            </button>
+
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#editRecordModal">
+                                                    수정
+                                                </button>
+
+                                                <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal"
+                                                    data-bs-target="#recordHistoryModal">
+                                                    수정 이력
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- 하위 기록 펼치기 영역 -->
+                                        <div class="collapse mt-3" id="childRecords2" data-bs-parent="#record-list">
+
+                                            <hr>
+
+                                            <!-- 하위 기록 작성 -->
+                                            <textarea class="form-control mb-2" rows="3"
+                                                placeholder="하위 기록을 작성하세요"></textarea>
+
+                                            <div class="text-end mb-4">
+                                                <button class="btn btn-primary btn-sm">
+                                                    등록
+                                                </button>
+                                            </div>
+
+
+                                            <!-- 하위 기록 목록 -->
+                                            <div class="child-record-list d-flex flex-column gap-3">
+
+                                                <!-- 하위 기록 -->
+                                                <div class="card child-record-card">
+                                                    <div class="card-body">
+
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center mb-2">
+                                                            <span class="fw-bold child-record-author">
+                                                                <i class="fas fa-user me-1"></i> 팀원 A
+                                                            </span>
+                                                            <small class="text-muted">
+                                                                2099-12-31 00:00
+                                                            </small>
+                                                        </div>
+
+                                                        <p class="child-record-content mb-3">테스트 내용 A</p>
+
+                                                    </div>
+                                                </div>
+
+                                                <!-- 하위 기록 카드 -->
+                                                <div class="card child-record-card" data-child-id="child1">
+                                                    <div class="card-body">
+
+                                                        <!-- 작성자 및 작성일 -->
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center mb-2">
+                                                            <span class="fw-bold child-record-author">
+                                                                <i class="fas fa-user me-1"></i> 팀원 B
+                                                            </span>
+
+                                                            <small class="text-muted">
+                                                                2099-12-31 00:00
+                                                                <span class="child-record-edited ms-1 d-none">(수정됨)</span>
+                                                            </small>
+                                                        </div>
+                                                        
+                                                        <!-- 작성자에게만 표시 -->
+                                                        <!-- 읽기 모드 -->
+                                                        <div class="child-record-view">
+                                                            <p class="child-record-content mb-3">테스트 내용 B</p>
+
+                                                            <div class="d-flex justify-content-end gap-2">
+                                                                <button type="button"
+                                                                    class="btn btn-outline-secondary btn-sm edit-child-record">
+                                                                    <i class="fas fa-pen me-1"></i> 수정
+                                                                </button>
+
+                                                                <button type="button"
+                                                                    class="btn btn-outline-secondary btn-sm hide-child-record">
+                                                                    <i class="fas fa-eye-slash me-1"></i> 숨김
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- 수정 모드: 기본 숨김 -->
+                                                        <div class="child-record-edit d-none">
+
+                                                            <textarea class="form-control child-record-input" rows="4"
+                                                                placeholder="하위 기록 내용을 입력하세요" required></textarea>
+
+                                                            <div class="d-flex justify-content-end gap-2 mt-2">
+                                                                <button type="button"
+                                                                    class="btn btn-secondary btn-sm cancel-child-record">
+                                                                    취소
+                                                                </button>
+
+                                                                <button type="button"
+                                                                    class="btn btn-primary btn-sm save-child-record">
+                                                                    저장
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
 
                                             </div>
 
@@ -985,6 +1165,140 @@
                     </button>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 프로젝트 설정 Modal -->
+    <div class="modal fade" id="projectSettingsModal" tabindex="-1" aria-labelledby="projectSettingsModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="projectSettingsModalLabel">
+                        프로젝트 설정
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <!-- 1. 프로젝트 설정 메뉴 -->
+                    <div id="projectSettingsMenu" class="d-flex flex-column gap-3">
+
+                        <!-- 프로젝트 정보 수정 -->
+                        <button type="button" class="btn btn-outline-secondary text-start p-3" id="openProjectEdit">
+                            <i class="fas fa-pen me-2"></i>
+                            프로젝트 정보 수정
+                        </button>
+
+                        <!-- 초대 코드 -->
+                        <div>
+                            <label for="settingsProjectInviteCode" class="form-label">
+                                프로젝트 초대 코드
+                            </label>
+
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="settingsProjectInviteCode" value="ABCD-1234"
+                                    readonly>
+
+                                <button type="button" class="btn btn-outline-secondary" id="copyProjectInviteCode"
+                                    title="초대 코드 복사">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+
+                                <button type="button" class="btn btn-outline-danger" id="regenerateProjectInviteCode"
+                                    title="초대 코드 재발급">
+                                    <i class="fas fa-rotate me-1"></i>
+                                    재발급
+                                </button>
+                            </div>
+
+                            <div class="form-text">
+                                초대 코드를 재발급하면 기존 코드는 사용할 수 없습니다.
+                            </div>
+                        </div>
+
+                        <hr class="my-1">
+
+                        <!-- 프로젝트 나가기 -->
+                        <button type="button" class="btn btn-outline-danger text-start p-3" id="openProjectLeave">
+                            <i class="fas fa-right-from-bracket me-2"></i>
+                            프로젝트 나가기
+                        </button>
+
+                    </div>
+
+
+                    <!-- 2. 프로젝트 정보 수정 -->
+                    <div id="projectSettingsEdit" class="d-none">
+                        <form id="projectSettingsForm">
+
+                            <div class="mb-3">
+                                <label for="settingsProjectName" class="form-label">프로젝트명</label>
+                                <input type="text" class="form-control" id="settingsProjectName" maxlength="50"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="settingsProjectDescription" class="form-label">프로젝트 설명</label>
+                                <textarea class="form-control" id="settingsProjectDescription" rows="5"></textarea>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="settingsProjectDueDate" class="form-label">마감일</label>
+                                    <input type="date" class="form-control" id="settingsProjectDueDate" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="settingsProjectMaxMembers" class="form-label">최대 참여 인원</label>
+                                    <input type="number" class="form-control" id="settingsProjectMaxMembers" min="1"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-secondary settings-back">
+                                    뒤로
+                                </button>
+
+                                <button type="submit" class="btn btn-primary">
+                                    변경사항 저장
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+
+                    <!-- 3. 프로젝트 나가기 확인 -->
+                    <div id="projectSettingsLeave" class="d-none">
+
+                        <p class="mb-3">
+                            정말 이 프로젝트에서 나가시겠습니까?
+                        </p>
+
+                        <div class="alert alert-warning">
+                            프로젝트에서 나가면 해당 프로젝트에 접근할 수
+                            없게 됩니다. 다시 참여하려면 초대 코드가
+                            필요할 수 있습니다.
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary settings-back">
+                                취소
+                            </button>
+
+                            <button type="button" class="btn btn-danger" id="confirmLeaveProject">
+                                프로젝트 나가기
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
