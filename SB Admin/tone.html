@@ -111,72 +111,74 @@
                          <div class="tone-page">
                             <h1 class="tone-title"><i class="fas fa-envelope-open-text me-2"></i>AI 톤 체인저</h1>
                             <div class="row">
-                                <div class="col-lg-3">
+                                <!-- 왼편 감정 온도 막대 -->
+                                <div class="col-lg-2">
                                     <div class="card mb-4">
                                         <div class="card-body">
                                             <h5 class="mb-3">감정 온도</h5>
-
-                                            <div class="d-flex justify-content-between small">
-                                                <span>냉철함</span>
-                                                <span>흥분함</span>
-                                            </div>
-                                            <div class="progress mb-3">
-                                                <div class="progress-bar" style="width: 50%"></div>
-                                            </div>
-
-                                            <div class="d-flex justify-content-between small">
-                                                <span>친근함</span>
-                                                <span>격식적</span>
-                                            </div>
-                                            <div class="progress mb-4">
-                                                <div class="progress-bar" style="width: 50%"></div>
-                                            </div>
-
+                                            <div class="temp-bars mb-4">
+                                                <div class="temp-item">
+                                                    <span>진중함</span>
+                                                    <div class="temp-bar">
+                                                        <div class="temp-fill temp-fill-calm" style="height: 50%"></div>
+                                                    </div>
+                                                    <span>흥분함</span>
+                                                </div>
+                                                <div class="temp-item">
+                                                    <span>격식적</span>
+                                                    <div class="temp-bar">
+                                                        <div class="temp-fill temp-fill-formal" style="height: 50%"></div>
+                                                    </div>
+                                                    <span>친근함</span>
+                                                </div>
+                                            </div>  
                                             <h5 class="mb-3">주의 표현</h5>
-                                            <span class="badge bg-secondary">반말</span>
-                                            <span class="badge bg-secondary">초성 표현</span>
-                                            <span class="badge bg-secondary">이모티콘</span>
-                                            <span class="badge bg-secondary">줄임말</span>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <span class="badge bg-secondary badge-banmal">반말</span>
+                                                <span class="badge bg-secondary badge-chosung">초성 표현</span>
+                                                <span class="badge bg-secondary badge-emoticon">이모티콘</span>
+                                                <span class="badge bg-secondary badge-short">줄임말</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                 <!-- 중앙 텍스트 입력창 -->
+                                <div class="col-lg-7">
                                     <div class="tone-wrap mb-3">
-                                        <textarea class="form-control tone-box" placeholder="다듬고 싶은 문장을 입력하세요"></textarea>
-                                        
+                                        <textarea class="form-control tone-box tone-input" placeholder="다듬고 싶은 문장을 입력하세요"></textarea>
                                     </div>
+                                    <div class="text-danger mt-2 tone-error"></div>
+                                    <!-- 중앙 결과 출력창 -->
                                     <div class="tone-wrap">
-                                        <textarea class="form-control tone-box" placeholder="바뀐 문장이 여기에 나와요" readonly></textarea>
+                                        <textarea class="form-control tone-box tone-output" placeholder="바뀐 문장이 여기에 나와요" readonly></textarea>
                                         <button class="btn text-secondary tone-copy" type="button"><i class="far fa-copy"></i></button>
                                     </div>
                                 </div>
+                                <!-- 오른편 메뉴 설정창 -->
                                 <div class="col-lg-3">
                                     <div class="card mb-4">
                                         <div class="card-body">
+                                            <h5 class="mb-3">톤 검사</h5>
+                                            <div class="text-muted">톤 변환 없이 검사만 해요</div>
+                                            <button class="btn btn-outline-primary w-100 mb-4 tone-btn tone-check" type="button">톤 검사</button>
                                             <h5 class="mb-3">받는 사람</h5>
-                                            <select class="form-select mb-4">
+                                            <select class="form-select mb-4 tone-target">
                                                 <option>교수님</option>
+                                                <option>조교</option>
                                                 <option>선배</option>
                                                 <option>팀원</option>
                                             </select>
-
-                                            <h5 class="mb-3">맞춤법</h5>
-                                            <button class="btn btn-outline-primary w-100 mb-4" type="button">맞춤법 검사</button>
-
-                                            <h5 class="mb-3">톤 변환</h5>
-                                            <button class="btn btn-outline-primary w-100 mb-4" type="button">톤 변환</button>
-
                                             <h5 class="mb-3">템플릿</h5>
-                                            <div class="accordion" id="templateList">
-                                                <div class="accordion-item">
-                                                    <h2 class="accordion-header">
-                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#template1">과제 문의</button>
-                                                    </h2>
-                                                    <div class="accordion-collapse collapse" id="template1" data-bs-parent="#templateList">
-                                                        <div class="accordion-body">템플릿 내용</div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            <select class="form-select mb-4 tone-template">
+                                                <option>없음</option>
+                                                <option>과제 문의</option>
+                                                <option>결석 사유</option>
+                                                <option>성적 문의</option>
+                                                <option>팀플 연락</option>
+                                            </select>
+                                            <div class="text-muted">톤 검사 후 변환해요</div>
+                                            <h5 class="mb-3">톤 변환</h5>
+                                            <button class="btn btn-outline-primary w-100 mb-4 tone-btn tone-convert" type="button">톤 변환</button>
                                         </div>
                                     </div>
                                 </div>

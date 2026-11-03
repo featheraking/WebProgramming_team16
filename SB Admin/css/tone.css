@@ -15,10 +15,6 @@
     letter-spacing: -1px;
 }
 
-.tone-box {
-    height: 250px;
-}
-
 .tone-wrap {
     position: relative;
 }
@@ -33,4 +29,49 @@
 .tone-box {
     height: 500px;
     font-size: 20px;
+}
+
+.temp-bars {
+    display: flex;
+    justify-content: space-around;
+}
+
+.temp-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.temp-bar {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 24px;
+    height: 200px;
+    border-radius: 12px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+
+.temp-fill {
+    background-color: #0d6efd;
+    transition: height 0.5s ease, background-color 0.5s ease;
+}
+
+.tone-page .form-select,
+.tone-page .btn {
+    font-size: 20px;
+}
+
+.tone-page .badge {
+    font-size: 18px;
+}
+
+.tone-page h5 {
+    font-size: 24px;
+}
+
+.temp-fill.temp-low {
+    background-color: #fd7e14;
 }
