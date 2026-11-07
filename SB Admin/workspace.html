@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>페이지 이름 | Smart Campus Hub</title>
+    <title>팀 프로젝트 워크스페이스 | Smart Campus Hub</title>
     <!-- 공통 CSS (순서 유지) -->
     <link href="css/styles.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
@@ -175,7 +175,7 @@
                                     </div>
                                 </div>
 
-                                <!-- 프로젝트 검색 및 정렬 (JS 미구현) -->
+                                <!-- 프로젝트 검색 및 정렬 -->
                                 <div class="px-3 pt-3 pb-2">
                                     <div class="row g-3 align-items-end">
 
@@ -192,7 +192,7 @@
                                         </div>
 
                                         <!-- 생성일 기준 정렬 -->
-                                        <div class="col-12 col-md-6 col-lg-3">
+                                        <div class="col-12 col-lg-3">
                                             <label for="projectSort" class="form-label">생성일 정렬</label>
                                             <select class="form-select" id="projectSort">
                                                 <option value="desc">최신순 (내림차순)</option>
@@ -201,16 +201,25 @@
                                         </div>
 
                                         <!-- 생성일 기간 필터 -->
-                                        <div class="col-12 col-md-6 col-lg-4">
-                                            <label class="form-label">생성일 기간</label>
+                                        <div class="col-12 col-lg-2">
+                                            <label class="form-label">생성일 (시작)</label>
                                             <div class="d-flex gap-2">
                                                 <input type="date" class="form-control" id="projectStartDate"
                                                     aria-label="생성일 시작">
-                                                <input type="date" class="form-control" id="projectEndDate"
-                                                    aria-label="생성일 종료">
+                                                
                                             </div>
                                         </div>
+                                        <div class="col-12 col-lg-2">
+                                            <label class="form-label">생성일 (종료)</label>
+                                            <div class="d-flex gap-2">
+                                                <input type="date" class="form-control" id="projectEndDate"
+                                                    aria-label="생성일 종료">
+                                                
+                                            </div>
+                                        </div>
+                                        
                                     </div>
+
 
                                     <!-- 필터 초기화 버튼 -->
                                     <div class="d-flex justify-content-end mt-3">
@@ -225,49 +234,49 @@
                                 <!-- 프로젝트 카드 배치 -->
                                 <div class="card-body d-flex flex-column">
                                     <div class="row g-4" id="project-list">
-
-
-
-                                        <!-- 프로젝트 카드 형태
-                                        <div class="col-md-6 col-xl-4">
-                                            <div class="card h-100 border border-primary border-2 text-black project-card">
-                                                <div class="card-body">
-                                                    <h4 class="project-card-title text-limit-1">프로젝트 이름</h4>
-
-                                                    <p class="mb-3">
-                                                        <i class="fas fa-calendar-plus"></i>
-                                                        생성일자: <span class="project-created-at">2025-10-06</span>
-                                                        <br>
-                                                        <i class="fas fa-calendar-check"></i>
-                                                        마감일: <span class="project-due-date">2025-10-23</span>
-                                                    </p>
-
-                                                    <p class="project-card-expl text-limit-2">
-                                                        프로젝트 설명
-                                                    </p>
-
-                                                    <div class="d-flex flex-wrap justify-content-between my-3">
-                                                        <span class="task-count me-3">
-                                                            <i class="fas fa-briefcase"></i> 과제 3개
-                                                        </span>
-                                                        <span class="member-count me-3">
-                                                            <i class="fas fa-users"></i> 참여자 3/5명
-                                                        </span>
-                                                        <span></span>
-                                                    </div>
-
-                                                    <div class="d-flex align-items-center justify-content-end mt-auto">
-                                                        <a class="btn btn-primary px-4 py-2 mt-2"
-                                                            href="example_project.html">enter</a>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                        -->
-
+                                        <!-- JS로 카드 생성 -->
                                     </div>
                                 </div>
+
+                                <!-- 프로젝트 카드 템플릿 -->
+                                <template id="projectCardTemplate">
+                                    <div class="col-md-6 col-xl-4">
+                                        <div class="card h-100 border border-primary border-2 text-black project-card">
+                                            <div class="card-body">
+                                                <h4 class="project-card-title text-limit-1">프로젝트 이름</h4>
+
+                                                <p class="mb-3">
+                                                    <i class="fas fa-calendar-plus"></i>
+                                                    생성일자: <span class="project-created-at">2025-10-06</span>
+                                                    <br>
+                                                    <i class="fas fa-calendar-check"></i>
+                                                    마감일: <span class="project-due-date">2025-10-23</span>
+                                                </p>
+
+                                                <p class="project-card-expl text-limit-2">
+                                                    프로젝트 설명
+                                                </p>
+
+                                                <div class="d-flex flex-wrap justify-content-between my-3">
+                                                    <span class="task-count me-3">
+                                                        <i class="fas fa-briefcase"></i> 과제 3개
+                                                    </span>
+                                                    <span class="member-count me-3">
+                                                        <i class="fas fa-users"></i> 참여자 3/5명
+                                                    </span>
+                                                    <span></span>
+                                                </div>
+
+                                                <div class="d-flex align-items-center justify-content-end mt-auto">
+                                                    <a class="btn btn-primary px-4 py-2 mt-2 projectEnter"
+                                                        href="example_project.html">enter</a>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
                             </div>
                         </div>
 
@@ -325,7 +334,7 @@
                         <!-- 최대 인원 -->
                         <div class="mb-3">
                             <label for="projectMaxMembers" class="form-label">최대 참여 인원</label>
-                            <input type="number" class="form-control" id="projectMaxMembers" required>
+                            <input type="number" class="form-control" id="projectMaxMembers" min="1" max="99" required>
                         </div>
 
                     </div>
@@ -398,7 +407,8 @@
     <script src="js/frame.js"></script>
 
     <!-- JS 추가 -->
-    <script src="js/workspace.js"></script>
+    <script type="module" src="js/workspace_utils.js"></script>
+    <script type="module" src="js/workspace.js"></script>
 
 </body>
 
