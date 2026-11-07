@@ -176,7 +176,7 @@
             item.querySelector('.fas').classList.add(/^fa-[a-z0-9-]+$/.test(p.icon) ? p.icon : 'fa-folder');
             item.querySelector('.dh-project-name').textContent = p.name;
             item.querySelector('.dh-project-meta').textContent = `팀 프로젝트 · ${p.members}명`;
-            item.querySelector('.dh-enter').href = `workspace.html?project=${encodeURIComponent(p.id)}`;
+            item.querySelector('.dh-enter').href = `/workspace/project/${encodeURIComponent(p.id)}`;
             list.appendChild(item);
         });
     }

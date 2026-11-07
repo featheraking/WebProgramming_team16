@@ -291,7 +291,7 @@ document.getElementById("regenerateProjectInviteCode").addEventListener("click",
 
 // 프로젝트 탈퇴 (DB 연동 후 추가적인 작업 필요)
 document.getElementById("confirmLeaveProject").addEventListener("click", () => {
-    window.location.href = "workspace.html";
+    window.location.href = "/workspace";
 });
 
 

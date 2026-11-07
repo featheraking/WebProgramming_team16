@@ -67,7 +67,7 @@ function createProjectCard(project) {
     card.querySelector(".member-count").textContent = `참여자 ${project.currentMembers.length}/${project.maxMembers}명`;
 
     // 프로젝트 상세 페이지 이동
-    card.querySelector(".projectEnter").href = `project.html?id=${encodeURIComponent(project.id)}`;
+    card.querySelector(".projectEnter").href = `/workspace/project/${encodeURIComponent(project.id)}`;
 
     return card;
 }

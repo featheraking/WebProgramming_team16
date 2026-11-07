@@ -34,17 +34,15 @@
 
 
     // 1. 사이드바 현재 메뉴 표시
-    // 같은 파일을 가리키는 메뉴가 여러 개면 주소의 #까지 같은 메뉴를, 없으면 그 파일의 첫 번째 메뉴를 표시
     function markActiveMenu() {
-        const currentFile = location.pathname.split('/').pop() || 'index.html';
+        const current = location.pathname.replace(/\/+$/, '') || '/';
         const links = [...document.querySelectorAll('#sidenavAccordion .nav-link')];
-        const parse = (link) => {
-            const [path, hash = ''] = (link.getAttribute('href') || '').split('#');
-            return { file: path.split('?')[0].split('/').pop(), hash: hash ? '#' + hash : '' };
-        };
-        const candidates = links.filter((link) => parse(link).file === currentFile);
-        const activeLink = candidates.find((link) => parse(link).hash && parse(link).hash === location.hash)
-            || candidates[0];
+        const pathOf = (link) => (link.getAttribute('href') || '').split(/[?#]/)[0].replace(/\/+$/, '') || '/';
+        const matches = links.filter((link) => {
+            const path = pathOf(link);
+            return path === '/' ? current === '/' : current === path || current.startsWith(path + '/');
+        });
+        const activeLink = matches.sort((a, b) => pathOf(b).length - pathOf(a).length)[0];
 
         links.forEach((link) => {
             const active = link === activeLink;
