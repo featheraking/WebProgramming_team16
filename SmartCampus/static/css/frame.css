@@ -1,0 +1,198 @@
+.sch-frame {
+    --sch-navy: #172238;
+    --sch-navy-2: #1f2c45;
+    --sch-blue: #2f6fed;
+    --sch-text: #1b2537;
+    --sch-muted: #6b7689;
+    --sch-line: #e6ebf2;
+    --sch-bg: #f5f7fb;
+
+    font-family: Pretendard, -apple-system, "Malgun Gothic", sans-serif;
+    background: var(--sch-bg);
+}
+
+/* ---------- 사이드바 폭: 260px ---------- */
+.sch-frame .sb-topnav .navbar-brand { width: 260px; }
+.sch-frame #layoutSidenav #layoutSidenav_nav { flex-basis: 260px; transform: translateX(-260px); }
+.sch-frame #layoutSidenav #layoutSidenav_content { margin-left: -260px; }
+.sch-frame.sb-nav-fixed #layoutSidenav #layoutSidenav_nav { width: 260px; }
+.sch-frame.sb-nav-fixed #layoutSidenav #layoutSidenav_content { padding-left: 260px; }
+.sch-frame.sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav { transform: translateX(0); }
+@media (min-width: 992px) {
+    .sch-frame #layoutSidenav #layoutSidenav_nav { transform: translateX(0); }
+    .sch-frame #layoutSidenav #layoutSidenav_content { margin-left: 0; }
+    .sch-frame.sb-sidenav-toggled #layoutSidenav #layoutSidenav_nav { transform: translateX(-260px); }
+    .sch-frame.sb-sidenav-toggled #layoutSidenav #layoutSidenav_content { margin-left: -260px; }
+}
+
+/* ---------- 상단바 ---------- */
+.sch-frame .sb-topnav {
+    padding-top: 0;
+    padding-bottom: 0;
+    background: #fff;
+    box-shadow: inset 0 -1px 0 var(--sch-line), 0 1px 4px rgba(23, 43, 77, 0.04);
+}
+.sch-frame .sb-topnav .navbar-brand {
+    align-self: stretch;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-left: 1.25rem;
+    background: var(--sch-navy);
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+.sch-frame .sb-topnav .navbar-brand i { color: #5b9bff; font-size: 1.3rem; }
+.sch-frame .sb-topnav #sidebarToggle { color: var(--sch-muted); margin-left: 0.75rem; }
+
+.sch-frame .sch-search {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+}
+.sch-frame .sch-search .sch-field-icon {
+    display: flex;
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sch-muted);
+    font-size: 0.85rem;
+}
+.sch-frame .sch-search input {
+    width: 100%;
+    padding: 0.5rem 0.9rem 0.5rem 2.3rem;
+    border: 1px solid var(--sch-line);
+    border-radius: 10px;
+    background: #f9fafc;
+    font-size: 0.9rem;
+}
+.sch-frame .sch-search input:focus { outline: 2px solid rgba(47, 111, 237, 0.25); border-color: var(--sch-blue); }
+
+.sch-frame .sch-icon-btn {
+    position: relative;
+    border: 0;
+    background: transparent;
+    color: var(--sch-muted);
+    font-size: 1.1rem;
+    padding: 0.4rem 0.6rem;
+}
+.sch-frame .sch-icon-btn .sch-dot {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.45rem;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e5484d;
+}
+.sch-frame .sch-login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 0;
+    border-radius: 9px;
+    background: var(--sch-blue);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+.sch-frame .sch-login-btn:hover { background: #255fd6; }
+.sch-frame .sch-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--sch-text);
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+.sch-frame .sch-user .sch-avatar {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: #e8f0fe;
+    color: var(--sch-blue);
+}
+.sch-frame .sch-logout-btn {
+    border: 1px solid var(--sch-line);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--sch-muted);
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+}
+
+/* 로그인 드롭다운 패널 */
+.sch-frame .sch-login-panel {
+    width: 320px;
+    padding: 1.25rem;
+    margin-top: 0.6rem !important;
+    border: 1px solid var(--sch-line);
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(23, 43, 77, 0.14);
+}
+.sch-frame .sch-login-panel h6 { font-weight: 700; font-size: 1.05rem; margin-bottom: 1rem; }
+.sch-frame .sch-input {
+    position: relative;
+    margin-bottom: 0.65rem;
+}
+.sch-frame .sch-input .sch-field-icon {
+    display: flex;
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sch-muted);
+    font-size: 0.85rem;
+}
+.sch-frame .sch-input input {
+    width: 100%;
+    padding: 0.6rem 0.9rem 0.6rem 2.3rem;
+    border: 1px solid var(--sch-line);
+    border-radius: 9px;
+    font-size: 0.9rem;
+}
+.sch-frame .sch-login-panel .btn-primary { background: var(--sch-blue); border-color: var(--sch-blue); border-radius: 9px; padding: 0.6rem; font-weight: 600; }
+.sch-frame .sch-login-panel .sch-signup { margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--sch-line); text-align: center; font-size: 0.85rem; color: var(--sch-muted); }
+.sch-frame .sch-login-panel .sch-signup a { color: var(--sch-blue); font-weight: 600; text-decoration: none; }
+
+/* ---------- 사이드바 ---------- */
+.sch-frame .sb-sidenav-dark { background: var(--sch-navy); }
+.sch-frame .sb-sidenav .sb-sidenav-menu .nav { padding: 1rem 0.75rem; }
+.sch-frame .sb-sidenav-dark .sb-sidenav-menu .nav-link {
+    margin-bottom: 0.25rem;
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+    border-radius: 9px;
+    color: #c9d2e3;
+    font-size: 0.93rem;
+}
+.sch-frame .sb-sidenav-dark .sb-sidenav-menu .nav-link .sb-nav-link-icon { color: #c9d2e3; width: 1.25rem; margin-right: 0.85rem; text-align: center; }
+.sch-frame .sb-sidenav-dark .sb-sidenav-menu .nav-link:hover { background: var(--sch-navy-2); color: #fff; }
+.sch-frame .sb-sidenav-dark .sb-sidenav-menu .nav-link.active { background: var(--sch-blue); color: #fff; font-weight: 600; }
+.sch-frame .sb-sidenav-dark .sb-sidenav-menu .nav-link.active .sb-nav-link-icon { color: #fff; }
+.sch-frame .sch-nav-divider { height: 1px; margin: 0.9rem 0.5rem; background: rgba(255, 255, 255, 0.1); }
+.sch-frame .sb-sidenav-dark .sb-sidenav-footer { background: var(--sch-navy-2); color: #c9d2e3; }
+
+/* ---------- 로그인 상태에 따라 보이기/숨기기 (js/frame.js가 body에 is-logged-in을 붙임) ---------- */
+.sch-frame .sch-member-only { display: none !important; }
+.sch-frame.is-logged-in .sch-guest-only { display: none !important; }
+.sch-frame.is-logged-in .sch-member-only { display: flex !important; }
+
+/* ---------- 회원가입 모달 ---------- */
+.sch-frame #schRegisterModal .modal-content { border: 0; border-radius: 14px; }
+.sch-frame #schRegisterModal .modal-title { font-weight: 700; }
+.sch-frame #schRegisterModal .btn-primary { background: var(--sch-blue); border-color: var(--sch-blue); border-radius: 9px; padding: 0.65rem; font-weight: 600; }
+
+/* ---------- 푸터 ---------- */
+.sch-frame footer.bg-light { background: transparent !important; border-top: 1px solid var(--sch-line); }
+
+@media (max-width: 767.98px) {
+    .sch-frame .sch-search { display: none; }
+    .sch-frame .sch-login-btn span { display: none; }
+}

@@ -1,0 +1,1 @@
+# views 파일명 규칙: <각자 구현파트 페이지 이름>_views.py, Blueprint 변수명은 bp)

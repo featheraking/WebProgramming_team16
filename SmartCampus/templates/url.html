@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}URL 스캐너{% endblock %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/url.css') }}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+                    <div class="container-fluid px-4">
+                        <!-- ===== 본문 작업 ===== -->
+                        <div class="scan-page">
+                            <h1 class="scan-title"><i class="fas fa-shield-halved me-2"></i>URL 스캐너</h1>
+                            <!-- 1번 카드 : 링크 입력창 -->
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="mb-3 step-title"><span class="step-num">1</span>검사하고 싶은 링크를 입력하세요</h5>
+                                    <div class="input-group input-group-lg">
+                                        <input class="form-control scan-input" type="text" placeholder="https://example.com" />
+                                        <button class="btn btn-primary scan-button" type="button">검사하기</button>
+                                    </div>
+                                    <div class="text-danger small mt-2 scan-error"></div>
+                                    <!-- 버튼 링크 복사 안내 -->
+                                    <div class="copy-guide mt-3">
+                                        <div class="copy-guide-demo">
+                                            <span class="demo-button">다운로드</span>
+                                            <i class="fas fa-arrow-pointer demo-cursor"></i>
+                                            <div class="demo-menu">
+                                                <div>새 탭에서 링크 열기</div>
+                                                <div class="demo-menu-active">링크 주소 복사</div>
+                                                <div>검사</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-muted">
+                                            만약 다운로드 결과가 궁금한 버튼이 있다면, 버튼 위에서 <strong>마우스 오른쪽 클릭 → 링크 주소 복사</strong> 후 위 입력칸에 붙여 넣으세요.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 2번 카드 : 주소 확인창(링크 입력 전까지 숨겨짐) -->
+                            <div class="card mb-4 result-card">
+                                <div class="card-body">
+                                    <h5 class="mb-3 step-title"><span class="step-num">2</span>링크를 눌렀을 때 거쳐가는 주소가 나타나요</h5>
+                                    <p class="text-muted">지나가는 모든 주소와 그 사이트의 실제 위치를 보여줘요</p>
+                                    <p><strong>이동 횟수:</strong> -</p>
+                                    <ol>
+                                        <li>
+                                            <div class="d-flex justify-content-between">
+                                                <span>처음 보여지는 주소</span>
+                                                <span>미국</span>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="d-flex justify-content-between">
+                                                <span>거쳐 가는 주소</span>
+                                                <span>러시아</span>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="d-flex justify-content-between">
+                                                <span>최종 도착 주소</span>
+                                                <span>한국</span>
+                                            </div>
+                                        </li>
+                                    </ol>
+                                </div>
+                            </div>
+                            <!-- 3번 카드 : 스크린샷 확인창(링크 입력 전까지 숨겨짐) -->
+                            <div class="card mb-4 result-card">
+                                <div class="card-body">
+                                    <h5 class="mb-3 step-title"><span class="step-num">3</span>도착 사이트는 이렇게 생겼어요</h5>
+                                    <p class="text-muted">거쳐간 모든 사이트의 사진이에요</p>
+                                    <div id="screenshotCarousel" class="carousel slide carousel-dark screenshot-carousel">
+                                        <div class="carousel-inner">
+                                            <div class="carousel-item active">
+                                                <div class="screenshot-box">1번 주소 화면</div>
+                                                <div class="small text-muted mt-2 text-center">https://1.com</div>
+                                            </div>
+                                            <div class="carousel-item">
+                                                <div class="screenshot-box">2번 주소 화면</div>
+                                                <div class="small text-muted mt-2 text-center">https://2.com</div>
+                                            </div>
+                                            <div class="carousel-item">
+                                                <div class="screenshot-box">3번 주소 화면</div>
+                                                <div class="small text-muted mt-2 text-center">https://3.com</div>
+                                            </div>
+                                        </div>
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#screenshotCarousel" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon"></span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#screenshotCarousel" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 3번 카드 : 주가 정보 확인창(링크 입력 전까지 숨겨짐) -->
+                            <div class="card mb-4 result-card">
+                                <div class="card-body">
+                                    <h5 class="mb-3 step-title"><span class="step-num">4</span>추가 정보들을 살펴보세요</h5>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">
+                                            <strong>다운로드 파일</strong>
+                                            <div class="text-muted small mb-2">다운로드 되는 파일의 정보에요.</div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>실제 파일 이름</span>
+                                                <span>-</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>실제 파일 형식</span>
+                                                <span>-</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span>이중 확장자 여부</span>
+                                                <span>-</span>
+                                            </div>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>사이트 위험 감지</strong>
+                                                <div class="text-muted small">구글의 위험사이트 목록에 이 주소가 있는지 확인해요.</div>
+                                            </div>
+                                            <span>-</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+
+                                              
+                        <!-- ===== 각자 페이지 본문 끝 ===== -->
+                    </div>
+{% endblock %}
+
+{% block scripts %}
+        
+        <script src="{{ url_for('static', filename='js/url.js') }}"></script>
+{% endblock %}

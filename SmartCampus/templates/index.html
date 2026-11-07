@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}홈 대시보드{% endblock %}
+
+{% block head %}
+    <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+                    <div class="container-fluid px-4">
+                    <!-- 홈 대시보드 본문 -->
+                    <div class="dashboard-home">
+
+                        <!-- ===== 1. 환영 배너 ===== -->
+                        <section class="dh-hero">
+                            <div class="dh-hero-text">
+                                <h1 class="dh-hero-title">Smart Campus Hub 대시보드</h1>
+                                <p class="dh-hero-greeting" id="heroGreeting">안녕하세요! 🎓</p>
+                                <p class="dh-hero-sub" id="heroSub">로그인하고 나만의 학업 대시보드를 확인하세요.</p>
+                                <div class="dh-hero-chips">
+                                    <span class="dh-chip"><i class="fas fa-graduation-cap"></i><span id="heroDept">학과 정보 없음</span></span>
+                                    <span class="dh-chip"><i class="far fa-calendar"></i><span id="heroSemester">학기 정보 없음</span></span>
+                                </div>
+                            </div>
+                            <!-- 캠퍼스 일러스트 -->
+                            <!-- 실제 학교 사진을 쓴다면 <img src="assets/img/@사진" class="dh-hero-art" alt="">로 svg 교체 -->
+                            <svg class="dh-hero-art" viewBox="0 0 520 220" aria-hidden="true">
+                                <defs>
+                                    <linearGradient id="dhBuilding" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0" stop-color="#c9d8f0" /><stop offset="1" stop-color="#a9bfe3" />
+                                    </linearGradient>
+                                </defs>
+                                <rect x="150" y="105" width="300" height="115" fill="url(#dhBuilding)" />
+                                <polygon points="140,108 300,70 460,108" fill="#8fa9d6" />
+                                <rect x="270" y="20" width="60" height="200" fill="#b7cbea" />
+                                <polygon points="262,24 300,-12 338,24" fill="#7f9bcc" />
+                                <circle cx="300" cy="52" r="15" fill="#eef3fb" stroke="#7f9bcc" stroke-width="3" />
+                                <path d="M300 52 V43 M300 52 H308" stroke="#5b79b0" stroke-width="2.5" stroke-linecap="round" />
+                                <g fill="#eef3fb" opacity=".9">
+                                    <rect x="175" y="125" width="18" height="26" rx="3" /><rect x="210" y="125" width="18" height="26" rx="3" /><rect x="245" y="125" width="18" height="26" rx="3" />
+                                    <rect x="337" y="125" width="18" height="26" rx="3" /><rect x="372" y="125" width="18" height="26" rx="3" /><rect x="407" y="125" width="18" height="26" rx="3" />
+                                    <rect x="175" y="170" width="18" height="26" rx="3" /><rect x="210" y="170" width="18" height="26" rx="3" /><rect x="245" y="170" width="18" height="26" rx="3" />
+                                    <rect x="337" y="170" width="18" height="26" rx="3" /><rect x="372" y="170" width="18" height="26" rx="3" /><rect x="407" y="170" width="18" height="26" rx="3" />
+                                    <rect x="285" y="90" width="30" height="40" rx="15" /><rect x="285" y="165" width="30" height="55" rx="4" />
+                                </g>
+                                <g fill="#7cc191">
+                                    <circle cx="110" cy="185" r="42" /><circle cx="70" cy="200" r="30" /><circle cx="150" cy="200" r="28" />
+                                    <circle cx="480" cy="185" r="38" /><circle cx="510" cy="205" r="26" />
+                                </g>
+                                <g fill="#5fae78">
+                                    <circle cx="125" cy="205" r="26" /><circle cx="465" cy="205" r="24" />
+                                </g>
+                            </svg>
+                        </section>
+
+                        <!-- ===== 2. 실시간 요약 위젯 2개 ===== -->
+                        <div class="row g-4 mb-4">
+                            <!-- 위젯 1: 시험 플래너 -->
+                            <div class="col-xl-6">
+                                <article class="dh-card dh-summary dh-summary-exam">
+                                    <div class="dh-summary-icon"><i class="fas fa-calendar-days"></i></div>
+                                    <div class="dh-summary-body">
+                                        <h2 class="dh-card-title">시험 플래너</h2>
+                                        <div class="dh-summary-label">가장 임박한 시험</div>
+                                        <div class="dh-summary-main" id="ddayExamName">등록된 시험이 없어요</div>
+                                        <div class="dh-summary-meta"><i class="far fa-calendar"></i><span id="ddayExamDate">시험 스케줄러에서 시험을 추가해 보세요.</span></div>
+                                    </div>
+                                    <div class="dh-big-badge" id="ddayBadge">-</div>
+                                    <a class="dh-round-link" href="exam-scheduler-team.html" aria-label="시험 스케줄러로 이동"><i class="fas fa-arrow-right"></i></a>
+                                </article>
+                            </div>
+                            <!-- 위젯 2: 워크스페이스 알리미 -->
+                            <div class="col-xl-6">
+                                <article class="dh-card dh-summary dh-summary-team">
+                                    <div class="dh-summary-icon"><i class="fas fa-users"></i></div>
+                                    <div class="dh-summary-body">
+                                        <h2 class="dh-card-title">워크스페이스 알리미</h2>
+                                        <div class="dh-summary-label">진행 중인 팀플 과제</div>
+                                        <div class="dh-summary-main" id="taskTopTitle">진행 중인 과제가 없어요</div>
+                                        <div class="dh-summary-meta" id="taskCountDesc">참여 코드로 팀플 방에 입장해 보세요.</div>
+                                    </div>
+                                    <div class="dh-big-badge" id="taskCountBadge">0<small>건</small></div>
+                                    <a class="dh-round-link" href="workspace.html" aria-label="팀 프로젝트 워크스페이스로 이동"><i class="fas fa-arrow-right"></i></a>
+                                </article>
+                            </div>
+                        </div>
+
+                        <!-- ===== 3. 하단 작업 영역 (3분할) ===== -->
+                        <div class="row g-4 mb-4">
+                            <!-- 좌측: 뽀모도로 타이머 -->
+                            <div class="col-xl-4 col-lg-6">
+                                <article class="dh-card dh-panel" id="pomoCard" data-mode="focus">
+                                    <header class="dh-panel-head">
+                                        <h2 class="dh-card-title"><i class="fas fa-stopwatch"></i>뽀모도로 타이머</h2>
+                                        <span class="dh-goal-chip" id="pomoGoal">목표: 자유 공부</span>
+                                    </header>
+                                    <div class="dh-segment" id="pomoTabs" role="tablist">
+                                        <button type="button" class="active" data-mode="focus" role="tab" aria-selected="true">집중 25분</button>
+                                        <button type="button" data-mode="break" role="tab" aria-selected="false">휴식 5분</button>
+                                    </div>
+                                    <div class="dh-ring">
+                                        <svg viewBox="0 0 200 200" aria-hidden="true">
+                                            <circle class="dh-ring-track" cx="100" cy="100" r="88" />
+                                            <circle class="dh-ring-bar" id="pomoRing" cx="100" cy="100" r="88" />
+                                        </svg>
+                                        <div class="dh-ring-center">
+                                            <div class="dh-clock" id="pomoClock" aria-live="polite">25:00</div>
+                                            <div class="dh-clock-label" id="pomoLabel">집중 시간</div>
+                                        </div>
+                                    </div>
+                                    <div class="dh-pomo-actions">
+                                        <button type="button" class="dh-btn dh-btn-primary" id="pomoStartBtn"><i class="fas fa-play"></i>집중 시작</button>
+                                        <button type="button" class="dh-btn dh-btn-light" id="pomoResetBtn"><i class="fas fa-rotate-left"></i>초기화</button>
+                                    </div>
+                                    <p class="dh-pomo-status" id="pomoStatus">준비되면 시작 버튼을 눌러 주세요.</p>
+                                </article>
+                            </div>
+
+                            <!-- 중앙: 참여 중인 팀 프로젝트 -->
+                            <div class="col-xl-4 col-lg-6">
+                                <article class="dh-card dh-panel">
+                                    <header class="dh-panel-head">
+                                        <h2 class="dh-card-title"><i class="fas fa-users"></i>참여 중인 팀 프로젝트</h2>
+                                        <a class="dh-more" href="workspace.html">전체보기<i class="fas fa-chevron-right"></i></a>
+                                    </header>
+                                    <div class="dh-project-list" id="projectList">
+                                        <!-- dashboard.js가 프로젝트 카드를 채움 -->
+                                    </div>
+                                </article>
+                            </div>
+
+                            <!-- 우측: 스마트 도구 바로가기 -->
+                            <div class="col-xl-4 col-lg-12">
+                                <article class="dh-card dh-panel">
+                                    <header class="dh-panel-head">
+                                        <h2 class="dh-card-title"><i class="fas fa-wrench"></i>스마트 도구 바로가기</h2>
+                                    </header>
+                                    <div class="dh-tool-list">
+                                        <a class="dh-tool dh-tool-green" href="url.html">
+                                            <div class="dh-tool-icon"><i class="fas fa-shield-halved"></i></div>
+                                            <div class="dh-tool-text">
+                                                <div class="dh-tool-name">URL 보안 신호등 검사기</div>
+                                                <div class="dh-tool-desc">의심스러운 URL을 입력하고 피싱 여부를 확인하세요.</div>
+                                            </div>
+                                            <span class="dh-tool-go"><i class="fas fa-chevron-right"></i></span>
+                                        </a>
+                                        <a class="dh-tool dh-tool-purple" href="tone.html">
+                                            <div class="dh-tool-icon"><i class="far fa-envelope"></i></div>
+                                            <div class="dh-tool-text">
+                                                <div class="dh-tool-name">AI 교수님 메일 변환기</div>
+                                                <div class="dh-tool-desc">부드럽고 정중한 메일 문체로 바꿔보세요.</div>
+                                            </div>
+                                            <span class="dh-tool-go"><i class="fas fa-chevron-right"></i></span>
+                                        </a>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+
+                    </div>
+                    </div>
+{% endblock %}
+
+{% block scripts %}
+        <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

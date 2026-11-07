@@ -1,0 +1,24 @@
+
+.task-note-content {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    min-height: 2.5rem;
+}
+
+
+.task-note-input {
+    min-height: 100px;
+    resize: vertical;
+}
+
+
+.child-record-content {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    min-height: 24px;
+}
+
+.child-record-input {
+    min-height: 100px;
+    resize: vertical;
+}
