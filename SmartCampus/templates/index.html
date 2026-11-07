@@ -66,7 +66,7 @@
                                         <div class="dh-summary-meta"><i class="far fa-calendar"></i><span id="ddayExamDate">시험 스케줄러에서 시험을 추가해 보세요.</span></div>
                                     </div>
                                     <div class="dh-big-badge" id="ddayBadge">-</div>
-                                    <a class="dh-round-link" href="exam-scheduler-team.html" aria-label="시험 스케줄러로 이동"><i class="fas fa-arrow-right"></i></a>
+                                    <a class="dh-round-link" href="{{ url_for('scheduler.index') }}" aria-label="시험 스케줄러로 이동"><i class="fas fa-arrow-right"></i></a>
                                 </article>
                             </div>
                             <!-- 위젯 2: 워크스페이스 알리미 -->
@@ -80,7 +80,7 @@
                                         <div class="dh-summary-meta" id="taskCountDesc">참여 코드로 팀플 방에 입장해 보세요.</div>
                                     </div>
                                     <div class="dh-big-badge" id="taskCountBadge">0<small>건</small></div>
-                                    <a class="dh-round-link" href="workspace.html" aria-label="팀 프로젝트 워크스페이스로 이동"><i class="fas fa-arrow-right"></i></a>
+                                    <a class="dh-round-link" href="{{ url_for('workspace.index') }}" aria-label="팀 프로젝트 워크스페이스로 이동"><i class="fas fa-arrow-right"></i></a>
                                 </article>
                             </div>
                         </div>
@@ -121,7 +121,7 @@
                                 <article class="dh-card dh-panel">
                                     <header class="dh-panel-head">
                                         <h2 class="dh-card-title"><i class="fas fa-users"></i>참여 중인 팀 프로젝트</h2>
-                                        <a class="dh-more" href="workspace.html">전체보기<i class="fas fa-chevron-right"></i></a>
+                                        <a class="dh-more" href="{{ url_for('workspace.index') }}">전체보기<i class="fas fa-chevron-right"></i></a>
                                     </header>
                                     <div class="dh-project-list" id="projectList">
                                         <!-- dashboard.js가 프로젝트 카드를 채움 -->
@@ -136,7 +136,7 @@
                                         <h2 class="dh-card-title"><i class="fas fa-wrench"></i>스마트 도구 바로가기</h2>
                                     </header>
                                     <div class="dh-tool-list">
-                                        <a class="dh-tool dh-tool-green" href="url.html">
+                                        <a class="dh-tool dh-tool-green" href="{{ url_for('url.index') }}">
                                             <div class="dh-tool-icon"><i class="fas fa-shield-halved"></i></div>
                                             <div class="dh-tool-text">
                                                 <div class="dh-tool-name">URL 보안 신호등 검사기</div>
@@ -144,7 +144,7 @@
                                             </div>
                                             <span class="dh-tool-go"><i class="fas fa-chevron-right"></i></span>
                                         </a>
-                                        <a class="dh-tool dh-tool-purple" href="tone.html">
+                                        <a class="dh-tool dh-tool-purple" href="{{ url_for('tone.index') }}">
                                             <div class="dh-tool-icon"><i class="far fa-envelope"></i></div>
                                             <div class="dh-tool-text">
                                                 <div class="dh-tool-name">AI 교수님 메일 변환기</div>
