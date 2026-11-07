@@ -1,185 +1,183 @@
-// 일단 프로젝트 카드 정보는 로컬에 저장하게 해놨음
-// 필터링, 정렬 기능, 초대 코드 관련은 추후 추가 예정
-let projects = [];
+// 공용 함수 가져오기
+import { generateInviteCode, getCurrentDateTime, currentUserId, Users } from "./workspace_utils.js";
 
-try {
-    const savedProjects = JSON.parse(
-        localStorage.getItem("projects") || "[]"
-    );
 
-    projects = Array.isArray(savedProjects) ? savedProjects : [];
-} catch (error) {
-    console.error("프로젝트 데이터 불러오기 실패:", error);
+// 임시 프로젝트 데이터
+
+const projects = [
+    {
+        id: crypto.randomUUID(),
+        name: "테스트 프로젝트명(임시)",
+        description: "프로젝트 설명입니다.",
+        createdAt: "2026-11-01",
+        dueDate: "2026-12-31",
+        adminId: "user1",
+        inviteCode: "ABCD1234",
+        currentMembers: ["user1", "user2", "user3", "user4"],
+        maxMembers: 5,
+        taskCount: 0
+    }
+];
+
+
+//프로젝트 생성
+function createProject(data) {
+    const newProject = {
+        id: crypto.randomUUID(),
+        name: data.name,
+        description: data.description,
+        createdAt: getCurrentDateTime(),
+        dueDate: data.dueDate,
+        adminId: currentUserId,
+        inviteCode: generateInviteCode(),
+        maxMembers: data.maxMembers,
+        currentMembers: [currentUserId],
+        taskCount: 0
+    };
+
+    projects.push(newProject);
+
+    return newProject;
 }
 
-function getTodayDate() {
-    const now = new Date();
 
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-}
-
-function saveProjects() {
-    localStorage.setItem("projects", JSON.stringify(projects));
-}
-
+// 프로젝트 카드 생성
 function createProjectCard(project) {
-    const column = document.createElement("div");
-    column.className = "col-md-6 col-xl-4";
+    const template = document.getElementById("projectCardTemplate");
 
-    column.innerHTML = `
-        
-            <div class="card h-100 border border-primary border-2 text-black project-card">
-                <div class="card-body">
+    const card = template.content.firstElementChild.cloneNode(true);
 
-                    <h4 class="project-card-title text-limit-1"></h4>
+    // 프로젝트 ID 저장
+    card.dataset.projectId = project.id;
 
-                    <p class="mb-3">
-                        <i class="fas fa-calendar-plus"></i>
-                        생성일자: <span class="project-created-at"></span>
-                        <br>
-                        <i class="fas fa-calendar-check"></i>
-                        마감일: <span class="project-due-date"></span>
-                    </p>
+    // 프로젝트명
+    card.querySelector(".project-card-title").textContent = project.name;
 
-                    <p class="project-card-expl text-limit-2"></p>
+    // 프로젝트 설명
+    card.querySelector(".project-card-expl").textContent = project.description;
 
-                    <div class="d-flex flex-wrap justify-content-between my-3">
-                        <span class="task-count me-3"></span>
-                        <span class="member-count me-3"></span>
-                        <span></span>
-                    </div>
+    // 날짜
+    card.querySelector(".project-created-at").textContent = project.createdAt;
+    card.querySelector(".project-due-date").textContent = project.dueDate;
 
-                    <div class="d-flex align-items-center justify-content-end mt-auto">
-                        <a class="btn btn-primary px-4 py-2 mt-2">입장</a>
-                    </div>
+    // 과제 개수
+    card.querySelector(".task-count").textContent = `과제 ${project.taskCount}개`;
 
-                </div>
-            </div>
-        
-    `;
+    // 참여 인원
+    card.querySelector(".member-count").textContent = `참여자 ${project.currentMembers.length}/${project.maxMembers}명`;
 
-    column.querySelector("h4").textContent = project.name;
-    column.querySelector(".project-card-expl").textContent = project.description;
+    // 프로젝트 상세 페이지 이동
+    card.querySelector(".projectEnter").href = `project.html?id=${encodeURIComponent(project.id)}`;
 
-    column.querySelector(".project-created-at").textContent = `${project.createdAt}`;
-    column.querySelector(".project-due-date").textContent = `${project.dueDate}`;
-
-    column.querySelector(".task-count").textContent = `과제 ${project.taskCount}개`;
-    column.querySelector(".member-count").textContent = `참여자 ${project.memberCount}/${project.maxMembers}명`;
-
-    column.querySelector("a").href = `project.html?id=${encodeURIComponent(project.id)}`;
-
-    return column;
+    return card;
 }
 
-function renderProjects() {
 
+// 프로젝트 필터링 및 정렬
+function getFilteredProjects() {
+    // 값 받아오기
+    const search = document.getElementById("projectSearch").value.trim().toLowerCase();
+    const sortOrder = document.getElementById("projectSort").value;
+    const startDate = document.getElementById("projectStartDate").value;
+    const endDate = document.getElementById("projectEndDate").value;
+
+    // 검색 및 생성일 기간 필터링
+    const filteredProjects = projects.filter(project => {
+        const matchName = project.name.toLowerCase().includes(search);
+        const matchStart = !startDate || project.createdAt >= startDate;
+        const matchEnd = !endDate || project.createdAt <= endDate;
+        return matchName && matchStart && matchEnd;
+    });
+
+    // 생성일 기준 정렬
+    filteredProjects.sort((a, b) => {
+        const result = a.createdAt.localeCompare(b.createdAt);
+        return sortOrder === "asc" ? result : -result;
+    });
+
+    return filteredProjects;
+}
+
+
+// 프로젝트 목록 렌더링
+function renderProjects() {
     const container = document.getElementById("project-list");
 
-    if (!container) {
-        console.error("project-list 요소를 찾을 수 없습니다.");
-        return;
-    }
+    const filteredProjects = getFilteredProjects();
 
-    // 기존 프로젝트 카드 제거
     container.replaceChildren();
 
-    // 프로젝트가 하나도 없을 경우
-    if (projects.length === 0) {
+    // 표시할 프로젝트가 없는 경우
+    if (filteredProjects.length === 0) {
         const emptyMessage = document.createElement("div");
+
         emptyMessage.className = "col-12 text-center text-muted py-5";
-        emptyMessage.textContent = "등록된 프로젝트가 없습니다.";
+        emptyMessage.textContent = projects.length === 0 ? "등록된 프로젝트가 없습니다." : "조건에 맞는 프로젝트가 없습니다.";
 
         container.appendChild(emptyMessage);
         return;
     }
 
-    // 프로젝트 목록 순회 및 카드 생성
-    projects.forEach(project => {
+    // 프로젝트 카드 출력
+    filteredProjects.forEach(project => {
         const card = createProjectCard(project);
         container.appendChild(card);
     });
 }
 
-function createProject(data) {
 
-    // 프로젝트 객체 생성
-    const newProject = {
-        id: crypto.randomUUID(),
-        name: data.name,
-        description: data.description,
-        createdAt: getTodayDate(),
-        dueDate: data.dueDate,
-        taskCount: 0,
-        memberCount: 1,
-        maxMembers: data.maxMembers
-    };
+// 프로젝트 생성 폼
+const createProjectForm = document.getElementById("createProjectForm");
 
-    // 배열에 추가
-    projects.push(newProject);
+createProjectForm.addEventListener("submit", event => {
+    event.preventDefault();
 
-    // 브라우저 저장
-    saveProjects();
+    // 값 받아오기
+    const name = document.getElementById("projectName").value.trim();
+    const description = document.getElementById("projectDescription").value.trim();
+    const dueDate = document.getElementById("projectDueDate").value;
+    const maxMembers = Number(document.getElementById("projectMaxMembers").value);
 
-    // 화면 갱신
-    renderProjects();
-
-    return newProject;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    // 프로젝트 목록 출력
-    renderProjects();
-
-    const form = document.getElementById("createProjectForm");
-    const modalElement = document.getElementById("createProjectModal");
-
-    if (!form || !modalElement) {
-        console.error("프로젝트 생성 Form 또는 Modal을 찾을 수 없습니다.");
+    // 입력값 검사
+    if (!Number.isInteger(maxMembers) || maxMembers < 1) {
+        alert("최대 참여 인원을 올바르게 입력해주세요.");
         return;
     }
 
-    // 프로젝트 생성 버튼 이벤트
-    form.addEventListener("submit", event => {
+    // 새 프로젝트 생성
+    createProject({ name, description, dueDate, maxMembers });
 
-        // 기본 제출 동작 방지
-        event.preventDefault();
+    // 목록 갱신
+    renderProjects();
 
-        // Modal 입력값 추출
-        const data = {
-            name: document.getElementById("projectName").value.trim(),
+    // 입력 폼 초기화
+    createProjectForm.reset();
 
-            description: document.getElementById("projectDescription")
-                .value.trim(),
+    // Modal 닫기
+    const modalElement = document.getElementById("createProjectModal");
 
-            dueDate: document.getElementById("projectDueDate").value,
-
-            maxMembers: Number(
-                document.getElementById("projectMaxMembers").value
-            )
-        };
-
-
-        // 프로젝트 생성
-        try {
-            createProject(data);
-        } catch (error) {
-            console.error("프로젝트 생성 실패:", error);
-            alert("프로젝트 생성 중 오류가 발생했습니다.");
-            return;
-        }
-
-        // Modal 입력값 초기화
-        form.reset();
-
-        // Modal 닫기
-        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.hide();
-    });
-
+    bootstrap.Modal.getOrCreateInstance(modalElement).hide();
 });
+
+
+// 프로젝트 검색 & 필터 이벤트
+document.getElementById("projectSearch").addEventListener("input", renderProjects);
+
+document.getElementById("projectSort").addEventListener("change", renderProjects);
+document.getElementById("projectStartDate").addEventListener("change", renderProjects);
+document.getElementById("projectEndDate").addEventListener("change", renderProjects);
+
+
+// 필터 초기화
+document.getElementById("resetProjectFilters").addEventListener("click", () => {
+    document.getElementById("projectSearch").value = "";
+    document.getElementById("projectSort").value = "desc";
+    document.getElementById("projectStartDate").value = "";
+    document.getElementById("projectEndDate").value = "";
+
+    renderProjects();
+});
+
+
+// 초기 렌더링
+renderProjects();
