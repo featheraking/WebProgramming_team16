@@ -120,7 +120,7 @@ CREATE TABLE project_record_histories (
 -- 회원별로 바꾸려면 user_id INT NULL + FOREIGN KEY 추가
 CREATE TABLE url_scan_logs (
     id              INT AUTO_INCREMENT PRIMARY KEY,
-    ip_address      VARCHAR(45)  NOT NULL, -- IP 주소 (IPv6까지 고려해 넉넉하게 45자)
+    ip_address      VARCHAR(45)  NOT NULL UNIQUE, -- IP 주소 (IPv6까지 고려해 넉넉하게 45자)
     country         VARCHAR(100) NULL, -- 나라
     hosting_company VARCHAR(255) NULL, -- 호스팅 회사
     is_proxy        BOOLEAN      NOT NULL DEFAULT FALSE, -- 프록시 여부
