@@ -19,9 +19,7 @@ def split_statements(sql):
 def main():
     statements = split_statements(SCHEMA.read_text(encoding='utf-8'))
 
-    if '--yes' not in sys.argv:
-        answer = input(f"'{Config.DB_NAME}' DB를 생성. 기존 데이터는 삭제. ")
-        return
+    print(f"'{Config.DB_NAME}' DB를 새로 만듭니다. (기존 데이터는 삭제)")
 
     try:
         conn = pymysql.connect(host=Config.DB_HOST, port=Config.DB_PORT, user=Config.DB_USER,

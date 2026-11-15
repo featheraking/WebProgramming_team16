@@ -9,29 +9,15 @@
     // 시험 스케줄러(exam-scheduler.js) 저장 키
     const EXAM_STORAGE_KEY = 'smart-campus-exams-v1';
 
-    // ---------------------------------------------------------------
     // 데이터 계층 (Flask에서 수정할 예정)
     const SAMPLE_EXAMS = [
         { name: '웹프로그래밍', at: daysFromToday(3, 9, 0) },
         { name: '자료구조', at: daysFromToday(6, 13, 0) },
         { name: '선형대수', at: daysFromToday(10, 9, 0) },
     ];
-    // ---------------------------------------------------------------
 
-    // icon: Font Awesome 아이콘 이름, tone: blue | green | purple
-    const SAMPLE_PROJECTS = [
-        { id: 1, name: '캠퍼스 생활 편의 앱 기획', members: 4, icon: 'fa-laptop', tone: 'green' },
-        { id: 2, name: 'AI 기반 학습 도우미', members: 5, icon: 'fa-chart-column', tone: 'blue' },
-        { id: 3, name: '캠퍼스 보안 시스템', members: 3, icon: 'fa-lightbulb', tone: 'purple' },
-    ];
-
-    // 워크스페이스 칸반의 3단 상태: todo | doing | done (내게 배정된 과제만)
-    const SAMPLE_TASKS = [
-        { title: 'AI 서비스 기획안 작성', projectId: 2, status: 'doing', due: daysFromToday(2, 23, 59) },
-        { title: '화면 설계서 정리', projectId: 1, status: 'doing', due: daysFromToday(4, 23, 59) },
-        { title: '보안 요구사항 조사', projectId: 3, status: 'todo', due: daysFromToday(7, 23, 59) },
-        { title: '주제 선정 회의록 작성', projectId: 1, status: 'done', due: daysFromToday(-3, 23, 59) },
-    ];
+    const MAX_HOME_PROJECTS = 3;
+    let homeData = null;
 
     function daysFromToday(days, hour, minute) {
         const d = new Date();
@@ -53,12 +39,15 @@
         return { exams: SAMPLE_EXAMS, isSample: true };
     }
 
-    function loadProjects() {
-        return SAMPLE_PROJECTS;
-    }
-
-    function loadTasks() {
-        return SAMPLE_TASKS;
+    async function loadHomeData() {
+        if (!loadUser()) return null;
+        try {
+            const res = await fetch('/api/dashboard', { headers: { Accept: 'application/json' } });
+            const data = await res.json();
+            return data.ok ? data : null;
+        } catch {
+            return null;
+        }
     }
 
     // 로그인 정보는 공통 틀 스크립트(js/frame.js)가 관리
@@ -131,38 +120,51 @@
 
     // 2-2. 워크스페이스 알리미
     function renderTaskWidget() {
-        const tasks = loadTasks();
-        const doing = tasks
-            .filter((t) => t.status === 'doing')
-            .sort((a, b) => new Date(a.due) - new Date(b.due));
+        const tasks = homeData ? homeData.tasks : null;
+        const doingCount = tasks ? tasks.doingCount : 0;
 
         // "2건"에서 숫자만 크게, "건"은 작게
         const badge = $('#taskCountBadge');
-        badge.textContent = doing.length;
+        badge.textContent = doingCount;
         const unit = document.createElement('small');
         unit.textContent = '건';
         badge.appendChild(unit);
 
-        $('#taskTopTitle').textContent = doing.length ? doing[0].title : '진행 중인 과제가 없어요';
-        $('#taskCountDesc').textContent = tasks.length
-            ? `총 ${tasks.length}건 중 진행 중 과제 수`
-            : '참여 코드로 팀플 방에 입장해 보세요.';
+        if (!tasks) {
+            $('#taskTopTitle').textContent = '로그인하면 내 과제를 볼 수 있어요';
+            $('#taskCountDesc').textContent = '오른쪽 위 [로그인 / 회원가입]';
+            return;
+        }
+        $('#taskTopTitle').textContent = tasks.nearestTitle || '진행 중인 과제가 없어요';
+        $('#taskCountDesc').textContent = tasks.total
+            ? `총 ${tasks.total}건 중 진행 중 과제 수`
+            : '아직 맡은 과제가 없어요.';
     }
 
     // 3-2. 참여 중인 팀 프로젝트 목록
     const TONES = ['blue', 'green', 'purple'];
+    const ICONS = ['fa-laptop', 'fa-chart-column', 'fa-lightbulb'];
+
+    function formatDueDate(dateString) {
+        const [, month, day] = (dateString || '').split('-');
+        return month && day ? `${Number(month)}/${Number(day)}` : '';
+    }
 
     function renderProjects() {
-        const projects = loadProjects();
         const list = $('#projectList');
         list.replaceChildren();
 
-        if (!projects.length) {
-            list.innerHTML = '<p class="dh-empty">참여 코드로 팀플 방에 입장해 보세요.</p>';
+        if (!homeData) {
+            list.innerHTML = '<p class="dh-empty">로그인하면 참여 중인 프로젝트를 볼 수 있어요.</p>';
             return;
         }
-        projects.forEach((p) => {
-            const tone = TONES.includes(p.tone) ? p.tone : 'blue';
+        const projects = homeData.projects;
+        if (!projects.length) {
+            list.innerHTML = '<p class="dh-empty">아직 참여 중인 프로젝트가 없어요.<br><a href="/workspace">워크스페이스에서 프로젝트 만들기</a></p>';
+            return;
+        }
+        projects.slice(0, MAX_HOME_PROJECTS).forEach((p, index) => {
+            const tone = TONES[index % TONES.length];
             const item = document.createElement('div');
             item.className = `dh-project tone-${tone}`;
             item.innerHTML = `
@@ -173,12 +175,28 @@
                 </div>
                 <a class="dh-enter">입장하기</a>`;
             // 사용자 입력이 들어갈 수 있는 값은 textContent로 넣음 (XSS 방지)
-            item.querySelector('.fas').classList.add(/^fa-[a-z0-9-]+$/.test(p.icon) ? p.icon : 'fa-folder');
+            item.querySelector('.fas').classList.add(ICONS[index % ICONS.length]);
             item.querySelector('.dh-project-name').textContent = p.name;
-            item.querySelector('.dh-project-meta').textContent = `팀 프로젝트 · ${p.members}명`;
+            const due = formatDueDate(p.dueDate);
+            item.querySelector('.dh-project-meta').textContent =
+                `참여자 ${p.memberCount}/${p.maxMembers}명` + (due ? ` · 마감 ${due}` : '');
             item.querySelector('.dh-enter').href = `/workspace/project/${encodeURIComponent(p.id)}`;
             list.appendChild(item);
         });
+
+        if (projects.length > MAX_HOME_PROJECTS) {
+            const more = document.createElement('a');
+            more.className = 'dh-project-more';
+            more.href = '/workspace';
+            more.textContent = `+ ${projects.length - MAX_HOME_PROJECTS}개 프로젝트 더 보기`;
+            list.appendChild(more);
+        }
+    }
+
+    async function refreshHomeData() {
+        homeData = await loadHomeData();
+        renderTaskWidget();
+        renderProjects();
     }
 
     // 3-1. 뽀모도로 타이머
@@ -310,12 +328,14 @@
     window.addEventListener('DOMContentLoaded', () => {
         renderUser();
         renderExamWidget();
-        renderTaskWidget();
-        renderProjects();
+        refreshHomeData();
         initPomodoro();
 
         // 상단바에서 로그인,로그아웃하면 배너 인사말 갱신
-        document.addEventListener('sch:auth', renderUser);
+        document.addEventListener('sch:auth', () => {
+            renderUser();
+            refreshHomeData();
+        });
 
         // 자정이 지나면 D-Day가 바뀌므로 1분마다 다시 계산
         setInterval(renderExamWidget, 60000);

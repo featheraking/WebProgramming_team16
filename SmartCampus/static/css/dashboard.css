@@ -278,6 +278,12 @@
 }
 .dashboard-home .dh-enter:hover { background: #255fd6; color: #fff; }
 .dashboard-home .dh-empty { margin: 2rem 0; text-align: center; color: var(--dh-muted); }
+.dashboard-home .dh-empty { line-height: 1.8; }
+.dashboard-home .dh-empty a,
+.dashboard-home .dh-project-more { color: var(--dh-blue); font-weight: 600; text-decoration: none; }
+.dashboard-home .dh-project-more { display: block; padding: 0.25rem 0; text-align: center; font-size: 0.85rem; }
+.dashboard-home .dh-empty a:hover,
+.dashboard-home .dh-project-more:hover { text-decoration: underline; }
 
 /* 프로젝트·도구 색상 테마 */
 .dashboard-home .tone-blue   { --tone: var(--dh-blue);   --tone-soft: var(--dh-blue-soft); }
