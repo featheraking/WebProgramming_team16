@@ -8,7 +8,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from db import execute, query
 
-
 bp = Blueprint('auth', __name__)
 
 
@@ -153,6 +152,12 @@ def dashboard_data():
     if user_id is None:
         return fail('로그인이 필요해요.', 401)
 
+    exam = query(
+        '''SELECT name, exam_at FROM exams
+           WHERE user_id = %s AND exam_at > NOW()
+           ORDER BY exam_at LIMIT 1''',
+        (user_id,), one=True)
+
     projects = query(
         '''SELECT p.id, p.name, p.due_date, p.max_members,
                   (SELECT COUNT(*) FROM project_members m2 WHERE m2.project_id = p.id) AS member_count
@@ -174,6 +179,10 @@ def dashboard_data():
 
     return jsonify({
         'ok': True,
+        'nearestExam': {
+            'name': exam['name'],
+            'at': exam['exam_at'].isoformat(),
+        } if exam else None,
         'projects': [{
             'id': p['id'],
             'name': p['name'],

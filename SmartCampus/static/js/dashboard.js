@@ -1,43 +1,12 @@
-/* 데이터는 샘플 + 브라우저 저장소에서 읽음. */
-/* Flask에서 아래 데이터 계층의 함수들만 fetch('/api/...')으로 바꿀 예정 */
+/* 홈 대시보드: 로그인한 사람의 시험 · 과제 · 프로젝트는 /api/dashboard(views/auth_views.py)에서 불러옴 */
 
 (function () {
     'use strict';
 
     const $ = (sel) => document.querySelector(sel);
 
-    // 시험 스케줄러(exam-scheduler.js) 저장 키
-    const EXAM_STORAGE_KEY = 'smart-campus-exams-v1';
-
-    // 데이터 계층 (Flask에서 수정할 예정)
-    const SAMPLE_EXAMS = [
-        { name: '웹프로그래밍', at: daysFromToday(3, 9, 0) },
-        { name: '자료구조', at: daysFromToday(6, 13, 0) },
-        { name: '선형대수', at: daysFromToday(10, 9, 0) },
-    ];
-
     const MAX_HOME_PROJECTS = 3;
     let homeData = null;
-
-    function daysFromToday(days, hour, minute) {
-        const d = new Date();
-        d.setDate(d.getDate() + days);
-        d.setHours(hour, minute, 0, 0);
-        return d.toISOString();
-    }
-
-    function safeGet(key) {
-        try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
-    }
-
-    /** 시험 목록: 스케줄러에 등록된 시험이 있으면 사용 (없으면 샘플 사용) */
-    function loadExams() {
-        const saved = safeGet(EXAM_STORAGE_KEY);
-        if (saved && Array.isArray(saved.exams) && saved.exams.length) {
-            return { exams: saved.exams.map((e) => ({ name: e.name, at: e.at })), isSample: false };
-        }
-        return { exams: SAMPLE_EXAMS, isSample: true };
-    }
 
     async function loadHomeData() {
         if (!loadUser()) return null;
@@ -95,25 +64,21 @@
     }
 
     function renderExamWidget() {
-        const { exams, isSample } = loadExams();
-        const now = Date.now();
-        const upcoming = exams
-            .filter((e) => new Date(e.at).getTime() > now)
-            .sort((a, b) => new Date(a.at) - new Date(b.at));
-        nearestExam = upcoming[0] || null;
+        const exam = homeData ? homeData.nearestExam : null;
+        nearestExam = exam && new Date(exam.at).getTime() > Date.now() ? exam : null;
 
         const badge = $('#ddayBadge');
         if (!nearestExam) {
             badge.textContent = '-';
             badge.classList.remove('is-urgent');
-            $('#ddayExamName').textContent = '예정된 시험이 없어요';
-            $('#ddayExamDate').textContent = '시험 스케줄러에서 시험을 추가해 보세요.';
+            $('#ddayExamName').textContent = homeData ? '예정된 시험이 없어요' : '로그인하면 시험 D-Day를 볼 수 있어요';
+            $('#ddayExamDate').textContent = homeData ? '시험 스케줄러에서 시험을 추가해 보세요.' : '';
         } else {
             const diff = calcDday(nearestExam.at);
             badge.textContent = formatDday(diff);
             badge.classList.toggle('is-urgent', diff <= 3); // 3일 이내면 테두리로 강조
             $('#ddayExamName').textContent = nearestExam.name;
-            $('#ddayExamDate').textContent = formatExamDate(nearestExam.at) + (isSample ? ' · 샘플' : '');
+            $('#ddayExamDate').textContent = formatExamDate(nearestExam.at);
         }
         renderPomoGoal();
     }
@@ -195,6 +160,7 @@
 
     async function refreshHomeData() {
         homeData = await loadHomeData();
+        renderExamWidget();
         renderTaskWidget();
         renderProjects();
     }
@@ -327,7 +293,6 @@
     // 시작
     window.addEventListener('DOMContentLoaded', () => {
         renderUser();
-        renderExamWidget();
         refreshHomeData();
         initPomodoro();
 
@@ -339,9 +304,5 @@
 
         // 자정이 지나면 D-Day가 바뀌므로 1분마다 다시 계산
         setInterval(renderExamWidget, 60000);
-        // 다른 탭에서 시험 스케줄러를 수정하면 즉시 반영
-        window.addEventListener('storage', (e) => {
-            if (e.key === EXAM_STORAGE_KEY) renderExamWidget();
-        });
     });
 })();
