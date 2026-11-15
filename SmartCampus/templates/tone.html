@@ -17,20 +17,13 @@
                                     <div class="card mb-4">
                                         <div class="card-body">
                                             <h5 class="mb-3">감정 온도</h5>
-                                            <div class="temp-bars mb-4">
-                                                <div class="temp-item">
-                                                    <span>진중함</span>
-                                                    <div class="temp-bar">
-                                                        <div class="temp-fill temp-fill-calm" style="height: 50%"></div>
+                                            <div class="temper-bars mb-4">
+                                                <div class="temper-item">
+                                                    <span>공손함</span>
+                                                    <div class="temper-bar">
+                                                        <div class="temper-fill temper-fill-tone" style="height: 50%"></div>
                                                     </div>
-                                                    <span>흥분함</span>
-                                                </div>
-                                                <div class="temp-item">
-                                                    <span>격식적</span>
-                                                    <div class="temp-bar">
-                                                        <div class="temp-fill temp-fill-formal" style="height: 50%"></div>
-                                                    </div>
-                                                    <span>친근함</span>
+                                                    <span>가벼움</span>
                                                 </div>
                                             </div>  
                                             <h5 class="mb-3">주의 표현</h5>
@@ -72,14 +65,22 @@
                                             <h5 class="mb-3">템플릿</h5>
                                             <select class="form-select mb-4 tone-template">
                                                 <option>없음</option>
-                                                <option>과제 문의</option>
-                                                <option>결석 사유</option>
-                                                <option>성적 문의</option>
-                                                <option>팀플 연락</option>
+                                                <option>문의</option>
+                                                <option>요청</option>
+                                                <option>사과</option>
+                                                <option>감사</option>
+                                                <option>안내</option>
                                             </select>
                                             <div class="text-muted">톤 검사 후 변환해요</div>
                                             <h5 class="mb-3">톤 변환</h5>
                                             <button class="btn btn-outline-primary w-100 mb-4 tone-btn tone-convert" type="button">톤 변환</button>
+                                        </div>
+                                    </div>
+                                    <!-- 오른편 최근 기록 카드 -->
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h5 class="mb-3">최근 기록</h5>
+                                            <div class="list-group tone-logs"></div>
                                         </div>
                                     </div>
                                 </div>

@@ -31,30 +31,30 @@
     font-size: 20px;
 }
 
-.temp-bars {
+.temper-bars {
     display: flex;
     justify-content: space-around;
 }
 
-.temp-item {
+.temper-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 8px;
 }
 
-.temp-bar {
+.temper-bar {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    width: 24px;
+    width: 36px;
     height: 200px;
-    border-radius: 12px;
+    border-radius: 24px;
     background-color: #e9ecef;
     overflow: hidden;
 }
 
-.temp-fill {
+.temper-fill {
     background-color: #0d6efd;
     transition: height 0.5s ease, background-color 0.5s ease;
 }
@@ -72,6 +72,12 @@
     font-size: 24px;
 }
 
-.temp-fill.temp-low {
+.tone-log {                 /* 기록 한 줄: 길면 한 줄로 자르고 끝에 ... 표시 */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.temper-fill.temper-low {
     background-color: #fd7e14;
 }
