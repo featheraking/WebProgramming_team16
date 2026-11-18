@@ -3,1049 +3,1043 @@
 {% block title %}페이지 이름{% endblock %}
 
 {% block head %}
-    <link href="{{ url_for('static', filename='css/project.css') }}" rel="stylesheet" />
+<link href="{{ url_for('static', filename='css/project.css') }}" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
-                <div class="container-fluid px-4">
-                    <!-- ===== 본문 작업 ===== -->
+<div class="container-fluid px-4">
+    <!-- ===== 본문 작업 ===== -->
 
 
-                    <!-- 프로젝트명 및 설정 버튼 -->
-                    <div class="d-flex justify-content-between align-items-center mt-4 mb-2 gap-3">
+    <!-- 프로젝트명 및 설정 버튼 -->
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-2 gap-3">
 
-                        <h1 class="mb-0" id="projectTitle">
-                            프로젝트 예시
-                        </h1>
+        <h1 class="mb-0" id="projectTitle">
+            프로젝트 예시
+        </h1>
 
-                        <div class="d-flex align-items-center gap-2">
-                            <!-- 프로젝트 페이지 나가기 -->
-                            <a href="{{ url_for('workspace.index') }}" class="btn btn-primary"><i class="fas fa-sign-out"></i> 돌아가기</a>
+        <div class="d-flex align-items-center gap-2">
+            <!-- 프로젝트 페이지 나가기 -->
+            <a href="{{ url_for('workspace.index') }}" class="btn btn-primary"><i class="fas fa-sign-out"></i> 돌아가기</a>
 
-                            <!-- 설정 -->
-                            <button type="button" class="btn btn-outline-secondary" id="projectSettingsButton"
-                                data-bs-toggle="modal" data-bs-target="#projectSettingsModal" title="프로젝트 설정"
-                                aria-label="프로젝트 설정">
-                                <i class="fas fa-gear"></i>
-                            </button>
-                        </div>
+            <!-- 설정 -->
+            <button type="button" class="btn btn-outline-secondary" id="projectSettingsButton" data-bs-toggle="modal"
+                data-bs-target="#projectSettingsModal" title="프로젝트 설정" aria-label="프로젝트 설정">
+                <i class="fas fa-gear"></i>
+            </button>
+        </div>
 
 
+    </div>
+
+    <p>
+        <i class="fas fa-calendar-plus"></i> 생성일: <span id="projectCreatedAt">2099-12-31</span>
+        /
+        <i class="fas fa-calendar-check"></i> 기한: <span id="projectDueDate">2099-12-31</span>
+    </p>
+
+    <p>
+        <i class="fas fa-users"></i> 참여 인원수:
+        <span id="projectCurrentMembers">0</span>/<span id="projectMaxMembers">5</span>
+    </p>
+
+    <div class="card d-flex mb-4">
+        <p style="margin:15px; white-space: pre-wrap;" id="projectDescription">
+            프로젝트 설명 텍스트
+        </p>
+    </div>
+
+
+    <!-- 과제 목록 컨테이너 -->
+    <div class="row mb-4" id="task-container">
+        <div class="col-12">
+            <div class="card">
+
+                <!-- 제목 및 생성 버튼 -->
+                <div class="card-header bg-white">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="my-2">과제 목록</h3>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#createTaskModal">
+                            <i class="fas fa-plus me-1"></i> 과제 생성
+                        </button>
                     </div>
-
-                    <p>
-                        <i class="fas fa-calendar-plus"></i> 생성일: <span id="projectCreatedAt">2099-12-31</span>
-                        /
-                        <i class="fas fa-calendar-check"></i> 기한: <span id="projectDueDate">2099-12-31</span>
-                    </p>
-
-                    <p>
-                        <i class="fas fa-users"></i> 참여 인원수:
-                        <span id="projectCurrentMembers">0</span>/<span id="projectMaxMembers">5</span>
-                    </p>
-
-                    <div class="card d-flex mb-4">
-                        <p style="margin:15px; white-space: pre-wrap;" id="projectDescription">
-                            프로젝트 설명 텍스트
-                        </p>
-                    </div>
-
-
-                    <!-- 과제 목록 컨테이너 -->
-                    <div class="row mb-4" id="task-container">
-                        <div class="col-12">
-                            <div class="card">
-
-                                <!-- 제목 및 생성 버튼 -->
-                                <div class="card-header bg-white">
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <h3 class="my-2">과제 목록</h3>
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#createTaskModal">
-                                            <i class="fas fa-plus me-1"></i> 과제 생성
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="card-body">
-
-                                    <!-- 과제 검색 및 필터 -->
-                                    <div class="row g-3 mb-3 align-items-end">
-
-                                        <!-- 과제명 검색 -->
-                                        <div class="col-12 col-lg-5">
-                                            <label for="taskSearch" class="form-label">
-                                                과제명 검색
-                                            </label>
-                                            <input type="search" class="form-control" id="taskSearch"
-                                                placeholder="과제명을 입력하세요">
-                                        </div>
-
-                                        <!-- 담당자 필터 -->
-                                        <div class="col-md-6 col-lg-4">
-                                            <label for="taskAssigneeFilter" class="form-label">
-                                                담당자
-                                            </label>
-                                            <select class="form-select" id="taskAssigneeFilter">
-                                                <option value="all">전체 담당자</option>
-                                                <option value="user1">팀원 A</option>
-                                                <option value="user2">팀원 B</option>
-                                                <option value="user3">팀원 C</option>
-                                                <option value="user4">팀원 D</option>
-                                            </select>
-                                        </div>
-
-                                        <!-- 진행 상태 필터 -->
-                                        <div class="col-md-6 col-lg-3">
-                                            <label for="taskStatusFilter" class="form-label">
-                                                진행 상태
-                                            </label>
-                                            <select class="form-select" id="taskStatusFilter">
-                                                <option value="all">전체 상태</option>
-                                                <option value="todo">미시작</option>
-                                                <option value="progress">진행 중</option>
-                                                <option value="done">완료</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="row g-3 mb-4 align-items-end">
-                                        <div class="col-6 col-lg-9">
-                                            <button type="button" class="btn btn-outline-secondary" id="taskSortButton">
-                                                <i class="fas fa-sort me-1"></i>
-                                                마감일 오름차순
-                                            </button>
-                                        </div>
-
-                                        <div class="col-6 col-lg-3 d-flex gap-5 align-items-end">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="hideInactiveTasks">
-
-                                                <label class="form-check-label" for="hideInactiveTasks">
-                                                    비활성화된 과제 숨기기
-                                                </label>
-                                            </div>
-
-                                            <!-- 필터 초기화 -->
-                                            <div class="d-flex justify-content-end">
-                                                <button type="button" class="btn btn-outline-secondary btn-sm"
-                                                    id="resetTaskFilter">
-                                                    <i class="fas fa-undo me-1"></i>
-                                                    초기화
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="table-responsive">
-                                        <table class="table table-hover align-middle">
-
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th scope="col">과제명</th>
-                                                    <th scope="col">담당자</th>
-                                                    <th scope="col">진행 상태</th>
-                                                    <th scope="col">마감일</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody id="task-list">
-
-                                            </tbody>
-
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-
-
-                        </div>
-                    </div>
-                    <!-- 과제 템플릿 -->
-                    <template id="task-row-template">
-                        <tr>
-                            <!-- 과제명 -->
-                            <td>
-                                <button type="button"
-                                    class="btn btn-link text-decoration-none fw-bold p-0 text-start task-title"
-                                    data-bs-toggle="modal" data-bs-target="#taskDetailModal">
-                                </button>
-
-                                <span class="text-muted small ms-2 task-inactive d-none">
-                                    (비활성화됨)
-                                </span>
-
-                                <button type="button" class="btn btn-link btn-sm p-0 text-secondary edit-task-btn ms-2"
-                                    data-bs-toggle="modal" data-bs-target="#editTaskModal" title="과제 수정"
-                                    aria-label="과제 수정">
-                                    <i class="fas fa-pen"></i>
-                                </button>
-                            </td>
-
-                            <!-- 담당자 -->
-                            <td class="task-assignees"></td>
-
-                            <!-- 진행 상태 -->
-                            <td>
-                                <span class="badge task-status"></span>
-                            </td>
-
-                            <!-- 마감일 -->
-                            <td class="task-due-date"></td>
-                        </tr>
-                    </template>
-
-                    <!-- 기록 목록 컨테이너 -->
-                    <div class="card mb-4" id="record-container">
-
-                        <div class="card-header bg-white d-flex align-items-center justify-content-between">
-                            <h3 class="my-2">기록 목록</h3>
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="hideOtherHiddenRecords">
-
-                                    <label class="form-check-label" for="hideOtherHiddenRecords">
-                                        다른 사람의 숨겨진 기록 감추기
-                                    </label>
-                                </div>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#createRecordModal">
-                                    <i class="fas fa-plus me-1"></i> 기록 작성
-                                </button>
-                            </div>
-
-                        </div>
-
-                        <div class="card-body">
-
-                            <!-- 기록 카드들이 배치되는 영역 -->
-                            <div class="d-flex flex-column gap-3" id="record-list">
-                                <!-- 여기서부터 배치 -->
-                            </div>
-
-                            <!-- 상위 기록 템플릿 -->
-                            <template id="parent-record-template">
-                                <div class="card record-card">
-                                    <div class="card-body">
-
-                                        <!-- 상위 기록 제목과 작성 시각 -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <h5 class="record-title mb-2"></h5>
-                                            <small class="record-created-at text-muted"></small>
-                                        </div>
-
-                                        <!-- 작성자 -->
-                                        <p class="record-author text-muted small mb-3"></p>
-
-                                        <!-- 기록 본문 -->
-                                        <p class="record-content mb-3" style="white-space: pre-wrap;"></p>
-
-                                        <!-- 수정 및 하위 기록 펼치기 -->
-                                        <div class="record-actions d-flex justify-content-between align-items-center">
-                                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                                data-action="toggle-children">
-                                                펼치기
-                                            </button>
-
-                                            <div class="d-flex gap-2">
-                                                <button type="button" class="btn btn-outline-secondary btn-sm"
-                                                    data-action="edit-parent">
-                                                    수정
-                                                </button>
-
-                                                <button type="button" class="btn btn-outline-secondary btn-sm"
-                                                    data-action="history-parent">
-                                                    수정 이력
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <!-- 하위 기록 작성란: 항상 표시 -->
-                                        <div class="record-composer mt-3 border-top pt-3">
-                                            <textarea class="form-control mb-2 new-child-content" rows="3"
-                                                placeholder="하위 기록을 작성하세요"></textarea>
-
-                                            <div class="text-end">
-                                                <button type="button" class="btn btn-primary btn-sm"
-                                                    data-action="create-child">
-                                                    등록
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <!-- 하위 기록 목록: 펼칠 때만 표시 -->
-                                        <div class="record-children-panel mt-3 d-none">
-                                            <div class="childRecordList d-flex flex-column gap-3">
-                                            </div>
-
-                                            <div class="record-more-wrap text-center mt-3 d-none">
-                                                <button type="button" class="btn btn-outline-primary btn-sm"
-                                                    data-action="more-children">
-                                                    더 보기
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </template>
-
-                            <!-- 하위 기록 템플릿 -->
-                            <template id="child-record-template">
-                                <div class="card child-record-card">
-                                    <div class="card-body">
-
-                                        <!-- 작성자와 작성 시각 -->
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="fw-bold child-record-author"></span>
-
-                                            <small class="text-muted">
-                                                <span class="child-record-timestamp"></span>
-
-                                                <span class="child-record-edited d-none">
-                                                    (수정됨)
-                                                </span>
-
-                                                <span class="child-record-hidden badge bg-secondary ms-1 d-none">
-                                                    숨김
-                                                </span>
-                                            </small>
-                                        </div>
-
-                                        <!-- 읽기 모드 -->
-                                        <div class="child-record-view">
-                                            <p class="child-record-content mb-3" style="white-space: pre-wrap"></p>
-
-                                            <div class="child-record-actions d-flex justify-content-end gap-2">
-                                                <button type="button" class="btn btn-outline-secondary btn-sm"
-                                                    data-action="edit-child">
-                                                    수정
-                                                </button>
-
-                                                <button type="button" class="btn btn-outline-secondary btn-sm"
-                                                    data-action="toggle-child-hidden">
-                                                    숨김
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <!-- 수정 모드 -->
-                                        <div class="child-record-edit d-none">
-                                            <textarea class="form-control child-record-input" rows="4"
-                                                placeholder="하위 기록 내용을 입력하세요"></textarea>
-
-                                            <div class="d-flex justify-content-end gap-2 mt-2">
-                                                <button type="button" class="btn btn-secondary btn-sm"
-                                                    data-action="cancel-child">
-                                                    취소
-                                                </button>
-
-                                                <button type="button" class="btn btn-primary btn-sm"
-                                                    data-action="save-child">
-                                                    저장
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </template>
-
-
-
-
-                        </div>
-                    </div>
-
-                    <!-- ===== 각자 페이지 본문 끝 ===== -->
-                </div>
-{% endblock %}
-
-{% block modals %}
-    <!-- 과제 생성 Modal -->
-    <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel"
-        aria-hidden="true">
-
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createTaskModalLabel">
-                        새 과제 생성
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
 
-                <form id="createTaskForm">
-                    <div class="modal-body">
+                <div class="card-body">
 
-                        <!-- 과제명 -->
-                        <div class="mb-3">
-                            <label for="taskTitle" class="form-label">
-                                과제명
+                    <!-- 과제 검색 및 필터 -->
+                    <div class="row g-3 mb-3 align-items-end">
+
+                        <!-- 과제명 검색 -->
+                        <div class="col-12 col-lg-5">
+                            <label for="taskSearch" class="form-label">
+                                과제명 검색
                             </label>
-                            <input type="text" class="form-control" id="taskTitle" placeholder="새 과제" required
-                                maxlength="100">
+                            <input type="search" class="form-control" id="taskSearch" placeholder="과제명을 입력하세요">
                         </div>
 
-                        <!-- 과제 설명 -->
-                        <div class="mb-3">
-                            <label for="taskDescription" class="form-label">
-                                과제 설명
+                        <!-- 담당자 필터 -->
+                        <div class="col-md-6 col-lg-4">
+                            <label for="taskAssigneeFilter" class="form-label">
+                                담당자
                             </label>
-                            <textarea class="form-control" id="taskDescription" rows="5"></textarea>
-                        </div>
-
-                        <!-- 담당자 -->
-                        <div class="mb-3">
-                            <label for="taskAssignees" class="form-label">담당자</label>
-                            <select class="form-select" id="taskAssignees" multiple required>
+                            <select class="form-select" id="taskAssigneeFilter">
+                                <option value="all">전체 담당자</option>
+                                <!--
                                 <option value="user1">팀원 A</option>
                                 <option value="user2">팀원 B</option>
                                 <option value="user3">팀원 C</option>
                                 <option value="user4">팀원 D</option>
+                                -->
                             </select>
-                            <div class="form-text">
-                                Ctrl 키를 누른 상태에서 여러 담당자를 선택할 수 있습니다.
-                            </div>
                         </div>
 
-                        <div class="row g-3">
-                            <!-- 마감일 -->
-                            <div class="col-md-12">
-                                <label for="taskDueDate" class="form-label">마감일</label>
-                                <input type="date" class="form-control" id="taskDueDate" required>
-                            </div>
+                        <!-- 진행 상태 필터 -->
+                        <div class="col-md-6 col-lg-3">
+                            <label for="taskStatusFilter" class="form-label">
+                                진행 상태
+                            </label>
+                            <select class="form-select" id="taskStatusFilter">
+                                <option value="all">전체 상태</option>
+                                <option value="todo">미시작</option>
+                                <option value="progress">진행 중</option>
+                                <option value="done">완료</option>
+                            </select>
                         </div>
 
                     </div>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-primary">
-                            생성
-                        </button>
-                    </div>
-                </form>
+                    <div class="row g-3 mb-4 align-items-end">
+                        <div class="col-6 col-lg-9">
+                            <button type="button" class="btn btn-outline-secondary" id="taskSortButton">
+                                <i class="fas fa-sort me-1"></i>
+                                마감일 오름차순
+                            </button>
+                        </div>
 
+                        <div class="col-6 col-lg-3 d-flex gap-5 align-items-end">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="hideInactiveTasks">
+
+                                <label class="form-check-label" for="hideInactiveTasks">
+                                    비활성화된 과제 숨기기
+                                </label>
+                            </div>
+
+                            <!-- 필터 초기화 -->
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="resetTaskFilter">
+                                    <i class="fas fa-undo me-1"></i>
+                                    초기화
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">과제명</th>
+                                    <th scope="col">담당자</th>
+                                    <th scope="col">진행 상태</th>
+                                    <th scope="col">마감일</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="task-list">
+
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
             </div>
+
+
+
+        </div>
+    </div>
+    <!-- 과제 템플릿 -->
+    <template id="task-row-template">
+        <tr>
+            <!-- 과제명 -->
+            <td>
+                <button type="button" class="btn btn-link text-decoration-none fw-bold p-0 text-start task-title"
+                    data-bs-toggle="modal" data-bs-target="#taskDetailModal">
+                </button>
+
+                <span class="text-muted small ms-2 task-inactive d-none">
+                    (비활성화됨)
+                </span>
+
+                <button type="button" class="btn btn-link btn-sm p-0 text-secondary edit-task-btn ms-2"
+                    data-bs-toggle="modal" data-bs-target="#editTaskModal" title="과제 수정" aria-label="과제 수정">
+                    <i class="fas fa-pen"></i>
+                </button>
+            </td>
+
+            <!-- 담당자 -->
+            <td class="task-assignees"></td>
+
+            <!-- 진행 상태 -->
+            <td>
+                <span class="badge task-status"></span>
+            </td>
+
+            <!-- 마감일 -->
+            <td class="task-due-date"></td>
+        </tr>
+    </template>
+
+    <!-- 기록 목록 컨테이너 -->
+    <div class="card mb-4" id="record-container">
+
+        <div class="card-header bg-white d-flex align-items-center justify-content-between">
+            <h3 class="my-2">기록 목록</h3>
+            <div class="d-flex align-items-center gap-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="hideOtherHiddenRecords">
+
+                    <label class="form-check-label" for="hideOtherHiddenRecords">
+                        다른 사람의 숨겨진 기록 감추기
+                    </label>
+                </div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#createRecordModal">
+                    <i class="fas fa-plus me-1"></i> 기록 작성
+                </button>
+            </div>
+
+        </div>
+
+        <div class="card-body">
+
+            <!-- 기록 카드들이 배치되는 영역 -->
+            <div class="d-flex flex-column gap-3" id="record-list">
+                <!-- 여기서부터 배치 -->
+            </div>
+
+            <!-- 상위 기록 템플릿 -->
+            <template id="parent-record-template">
+                <div class="card record-card">
+                    <div class="card-body">
+
+                        <!-- 상위 기록 제목과 작성 시각 -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="record-title mb-2"></h5>
+                            <small class="record-created-at text-muted"></small>
+                        </div>
+
+                        <!-- 작성자 -->
+                        <p class="record-author text-muted small mb-3"></p>
+
+                        <!-- 기록 본문 -->
+                        <p class="record-content mb-3" style="white-space: pre-wrap;"></p>
+
+                        <!-- 수정 및 하위 기록 펼치기 -->
+                        <div class="record-actions d-flex justify-content-between align-items-center">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-action="toggle-children">
+                                펼치기
+                            </button>
+
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    data-action="edit-parent">
+                                    수정
+                                </button>
+
+                                <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    data-action="history-parent">
+                                    수정 이력
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 하위 기록 작성란: 항상 표시 -->
+                        <div class="record-composer mt-3 border-top pt-3">
+                            <textarea class="form-control mb-2 new-child-content" rows="3"
+                                placeholder="하위 기록을 작성하세요"></textarea>
+
+                            <div class="text-end">
+                                <button type="button" class="btn btn-primary btn-sm" data-action="create-child">
+                                    등록
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 하위 기록 목록: 펼칠 때만 표시 -->
+                        <div class="record-children-panel mt-3 d-none">
+                            <div class="childRecordList d-flex flex-column gap-3">
+                            </div>
+
+                            <div class="record-more-wrap text-center mt-3 d-none">
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                    data-action="more-children">
+                                    더 보기
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </template>
+
+            <!-- 하위 기록 템플릿 -->
+            <template id="child-record-template">
+                <div class="card child-record-card">
+                    <div class="card-body">
+
+                        <!-- 작성자와 작성 시각 -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold child-record-author"></span>
+
+                            <small class="text-muted">
+                                <span class="child-record-timestamp"></span>
+
+                                <span class="child-record-edited d-none">
+                                    (수정됨)
+                                </span>
+
+                                <span class="child-record-hidden badge bg-secondary ms-1 d-none">
+                                    숨김
+                                </span>
+                            </small>
+                        </div>
+
+                        <!-- 읽기 모드 -->
+                        <div class="child-record-view">
+                            <p class="child-record-content mb-3" style="white-space: pre-wrap"></p>
+
+                            <div class="child-record-actions d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" data-action="edit-child">
+                                    수정
+                                </button>
+
+                                <button type="button" class="btn btn-outline-secondary btn-sm"
+                                    data-action="toggle-child-hidden">
+                                    숨김
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 수정 모드 -->
+                        <div class="child-record-edit d-none">
+                            <textarea class="form-control child-record-input" rows="4"
+                                placeholder="하위 기록 내용을 입력하세요"></textarea>
+
+                            <div class="d-flex justify-content-end gap-2 mt-2">
+                                <button type="button" class="btn btn-secondary btn-sm" data-action="cancel-child">
+                                    취소
+                                </button>
+
+                                <button type="button" class="btn btn-primary btn-sm" data-action="save-child">
+                                    저장
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </template>
+
+
+
+
         </div>
     </div>
 
+    <!-- ===== 각자 페이지 본문 끝 ===== -->
+</div>
+{% endblock %}
 
-    <!-- 과제 상세 조회 Modal -->
-    <div class="modal fade" id="taskDetailModal" tabindex="-1" aria-labelledby="taskDetailModalLabel"
-        aria-hidden="true">
+{% block modals %}
+<!-- 과제 생성 Modal -->
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
 
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
 
-                <!-- Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title" id="taskDetailModalLabel">
-                        과제 상세 정보
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                </div>
+            <div class="modal-header">
+                <h5 class="modal-title" id="createTaskModalLabel">
+                    새 과제 생성
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
 
-                <!-- Body -->
+            <form id="createTaskForm">
                 <div class="modal-body">
 
                     <!-- 과제명 -->
-                    <h4 id="detailTaskTitle" class="mb-3">
-                        과제 상세 예시
-                    </h4>
-
-                    <!-- 진행 상태 -->
                     <div class="mb-3">
-                        <span class="badge bg-secondary" id="detailTaskStatus">
-                            미시작
-                        </span>
+                        <label for="taskTitle" class="form-label">
+                            과제명
+                        </label>
+                        <input type="text" class="form-control" id="taskTitle" placeholder="새 과제" required
+                            maxlength="100">
                     </div>
 
                     <!-- 과제 설명 -->
-                    <div class="mb-4">
-                        <h5>과제 설명</h5>
-                        <p id="detailTaskDescription" class="mb-0 text-break">
-                            설명 예시
-                        </p>
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">
+                            과제 설명
+                        </label>
+                        <textarea class="form-control" id="taskDescription" rows="5"></textarea>
                     </div>
 
-                    <hr>
-
-                    <div class="row mb-3">
-                        <!-- 담당자 -->
-                        <div class="col-md-6">
-                            <h6>
-                                <i class="fas fa-users me-1"></i> 담당자
-                            </h6>
-                            <p id="detailTaskAssignees" class="mb-0">
-                                팀원
-                            </p>
+                    <!-- 담당자 -->
+                    <div class="mb-3">
+                        <label for="taskAssignees" class="form-label">담당자</label>
+                        <select class="form-select" id="taskAssignees" multiple required>
+                            <!--
+                            <option value="user1">팀원 A</option>
+                            <option value="user2">팀원 B</option>
+                            <option value="user3">팀원 C</option>
+                            <option value="user4">팀원 D</option>
+                            -->
+                        </select>
+                        <div class="form-text">
+                            Ctrl 키를 누른 상태에서 여러 담당자를 선택할 수 있습니다.
                         </div>
                     </div>
 
                     <div class="row g-3">
-                        <!-- 생성일 -->
-                        <div class="col-md-6">
-                            <h6>
-                                <i class="fas fa-calendar-plus me-1"></i> 생성일
-                            </h6>
-                            <p id="detailTaskCreatedAt" class="mb-0">
-                                2099-12-31
-                            </p>
-                        </div>
-
                         <!-- 마감일 -->
-                        <div class="col-md-6">
-                            <h6>
-                                <i class="fas fa-calendar-check me-1"></i> 마감일
-                            </h6>
-                            <p id="detailTaskDueDate" class="mb-0">
-                                2099-12-31
-                            </p>
+                        <div class="col-md-12">
+                            <label for="taskDueDate" class="form-label">마감일</label>
+                            <input type="date" class="form-control" id="taskDueDate" required>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">
+                        생성
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- 과제 상세 조회 Modal -->
+<div class="modal fade" id="taskDetailModal" tabindex="-1" aria-labelledby="taskDetailModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskDetailModalLabel">
+                    과제 상세 정보
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+
+                <!-- 과제명 -->
+                <h4 id="detailTaskTitle" class="mb-3">
+                    과제 상세 예시
+                </h4>
+
+                <!-- 진행 상태 -->
+                <div class="mb-3">
+                    <span class="badge bg-secondary" id="detailTaskStatus">
+                        미시작
+                    </span>
+                </div>
+
+                <!-- 과제 설명 -->
+                <div class="mb-4">
+                    <h5>과제 설명</h5>
+                    <p id="detailTaskDescription" class="mb-0 text-break">
+                        설명 예시
+                    </p>
+                </div>
+
+                <hr>
+
+                <div class="row mb-3">
+                    <!-- 담당자 -->
+                    <div class="col-md-6">
+                        <h6>
+                            <i class="fas fa-users me-1"></i> 담당자
+                        </h6>
+                        <p id="detailTaskAssignees" class="mb-0">
+                            팀원
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- 생성일 -->
+                    <div class="col-md-6">
+                        <h6>
+                            <i class="fas fa-calendar-plus me-1"></i> 생성일
+                        </h6>
+                        <p id="detailTaskCreatedAt" class="mb-0">
+                            2099-12-31
+                        </p>
+                    </div>
+
+                    <!-- 마감일 -->
+                    <div class="col-md-6">
+                        <h6>
+                            <i class="fas fa-calendar-check me-1"></i> 마감일
+                        </h6>
+                        <p id="detailTaskDueDate" class="mb-0">
+                            2099-12-31
+                        </p>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <!-- 담당자별 작업 기록 카드 -->
+                <h5 class="mb-3">담당자별 작업 기록</h5>
+
+                <div id="task-note-list" class="d-flex flex-column gap-3">
+                    <!-- JS로 동적 생성 -->
+                </div>
+
+                <template id="task-note-template">
+                    <div class="card task-note-card">
+
+                        <div class="card-header bg-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 task-note-author"></h6>
+
+                                <button type="button" class="btn btn-outline-secondary btn-sm edit-task-note">
+                                    <i class="fas fa-pen me-1"></i> 수정
+                                </button>
+                            </div>
                         </div>
 
-                    </div>
+                        <div class="card-body">
 
-                    <hr>
+                            <!-- 읽기 모드 -->
+                            <div class="task-note-view">
+                                <p class="task-note-content mb-0"></p>
+                            </div>
 
-                    <!-- 담당자별 작업 기록 카드 -->
-                    <h5 class="mb-3">담당자별 작업 기록</h5>
+                            <!-- 수정 모드 -->
+                            <div class="task-note-edit d-none">
+                                <textarea class="form-control task-note-input" rows="4"
+                                    placeholder="작업 내용을 입력하세요..."></textarea>
 
-                    <div id="task-note-list" class="d-flex flex-column gap-3">
-                        <!-- JS로 동적 생성 -->
-                    </div>
+                                <div class="d-flex justify-content-end gap-2 mt-2">
+                                    <button type="button" class="btn btn-secondary btn-sm cancel-task-note">
+                                        취소
+                                    </button>
 
-                    <template id="task-note-template">
-                        <div class="card task-note-card">
-
-                            <div class="card-header bg-white">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 task-note-author"></h6>
-
-                                    <button type="button" class="btn btn-outline-secondary btn-sm edit-task-note">
-                                        <i class="fas fa-pen me-1"></i> 수정
+                                    <button type="button" class="btn btn-primary btn-sm save-task-note">
+                                        저장
                                     </button>
                                 </div>
                             </div>
 
-                            <div class="card-body">
-
-                                <!-- 읽기 모드 -->
-                                <div class="task-note-view">
-                                    <p class="task-note-content mb-0"></p>
-                                </div>
-
-                                <!-- 수정 모드 -->
-                                <div class="task-note-edit d-none">
-                                    <textarea class="form-control task-note-input" rows="4"
-                                        placeholder="작업 내용을 입력하세요..."></textarea>
-
-                                    <div class="d-flex justify-content-end gap-2 mt-2">
-                                        <button type="button" class="btn btn-secondary btn-sm cancel-task-note">
-                                            취소
-                                        </button>
-
-                                        <button type="button" class="btn btn-primary btn-sm save-task-note">
-                                            저장
-                                        </button>
-                                    </div>
-                                </div>
-
-                            </div>
                         </div>
-                    </template>
+                    </div>
+                </template>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    닫기
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- 과제 수정 Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTaskModalLabel">
+                    과제 수정
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+
+            <form id="editTaskForm">
+
+                <div class="modal-body">
+
+                    <!-- 수정할 과제 ID -->
+                    <input type="hidden" id="editTaskId">
+
+                    <!-- 과제명 -->
+                    <div class="mb-3">
+                        <label for="editTaskTitle" class="form-label">
+                            과제명
+                        </label>
+                        <input type="text" class="form-control" id="editTaskTitle" maxlength="100" required>
+                    </div>
+
+                    <!-- 과제 설명 -->
+                    <div class="mb-3">
+                        <label for="editTaskDescription" class="form-label">
+                            과제 설명
+                        </label>
+                        <textarea class="form-control" id="editTaskDescription" rows="5"></textarea>
+                    </div>
+
+                    <!-- 담당자 (복수 선택 가능) -->
+                    <div class="mb-3">
+                        <label for="editTaskAssignees" class="form-label">
+                            담당자
+                        </label>
+                        <select class="form-select" id="editTaskAssignees" multiple required>
+                            <!--
+                            <option value="user1">팀원 A</option>
+                            <option value="user2">팀원 B</option>
+                            <option value="user3">팀원 C</option>
+                            <option value="user4">팀원 D</option>
+                            -->
+                        </select>
+                        <div class="form-text">
+                            Ctrl 키를 누른 상태에서 여러 담당자를 선택할 수 있습니다.
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+
+                        <!-- 마감일 -->
+                        <div class="col-md-6">
+                            <label for="editTaskDueDate" class="form-label">
+                                마감일
+                            </label>
+                            <input type="date" class="form-control" id="editTaskDueDate" required>
+                        </div>
+
+                        <!-- 진행 상태 -->
+                        <div class="col-md-6">
+                            <label for="editTaskStatus" class="form-label">
+                                진행 상태
+                            </label>
+                            <select class="form-select" id="editTaskStatus" required>
+                                <option value="todo">미시작</option>
+                                <option value="progress">진행 중</option>
+                                <option value="done">완료</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="taskActiveButton" class="form-label">
+                                활성화/비활성화
+                            </label>
+                            <br>
+                            <button type="button" class="btn btn-danger" id="taskActiveButton">
+                                비활성화
+                            </button>
+                        </div>
+                    </div>
 
                 </div>
 
                 <!-- Footer -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        닫기
+                        취소
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        변경사항 저장
                     </button>
                 </div>
 
-            </div>
+            </form>
+
         </div>
     </div>
+</div>
 
 
-    <!-- 과제 수정 Modal -->
-    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+<!-- 기록 생성 Modal -->
+<div class="modal fade" id="createRecordModal" tabindex="-1" aria-labelledby="createRecordModalLabel"
+    aria-hidden="true">
 
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
 
-                <!-- Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editTaskModalLabel">
-                        과제 수정
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                </div>
-
-                <form id="editTaskForm">
-
-                    <div class="modal-body">
-
-                        <!-- 수정할 과제 ID -->
-                        <input type="hidden" id="editTaskId">
-
-                        <!-- 과제명 -->
-                        <div class="mb-3">
-                            <label for="editTaskTitle" class="form-label">
-                                과제명
-                            </label>
-                            <input type="text" class="form-control" id="editTaskTitle" maxlength="100" required>
-                        </div>
-
-                        <!-- 과제 설명 -->
-                        <div class="mb-3">
-                            <label for="editTaskDescription" class="form-label">
-                                과제 설명
-                            </label>
-                            <textarea class="form-control" id="editTaskDescription" rows="5"></textarea>
-                        </div>
-
-                        <!-- 담당자 (복수 선택 가능) -->
-                        <div class="mb-3">
-                            <label for="editTaskAssignees" class="form-label">
-                                담당자
-                            </label>
-                            <select class="form-select" id="editTaskAssignees" multiple required>
-                                <option value="user1">팀원 A</option>
-                                <option value="user2">팀원 B</option>
-                                <option value="user3">팀원 C</option>
-                                <option value="user4">팀원 D</option>
-                            </select>
-                            <div class="form-text">
-                                Ctrl 키를 누른 상태에서 여러 담당자를 선택할 수 있습니다.
-                            </div>
-                        </div>
-
-                        <div class="row g-3">
-
-                            <!-- 마감일 -->
-                            <div class="col-md-6">
-                                <label for="editTaskDueDate" class="form-label">
-                                    마감일
-                                </label>
-                                <input type="date" class="form-control" id="editTaskDueDate" required>
-                            </div>
-
-                            <!-- 진행 상태 -->
-                            <div class="col-md-6">
-                                <label for="editTaskStatus" class="form-label">
-                                    진행 상태
-                                </label>
-                                <select class="form-select" id="editTaskStatus" required>
-                                    <option value="todo">미시작</option>
-                                    <option value="progress">진행 중</option>
-                                    <option value="done">완료</option>
-                                </select>
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="taskActiveButton" class="form-label">
-                                    활성화/비활성화
-                                </label>
-                                <br>
-                                <button type="button" class="btn btn-danger" id="taskActiveButton">
-                                    비활성화
-                                </button>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            취소
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            변경사항 저장
-                        </button>
-                    </div>
-
-                </form>
-
+            <div class="modal-header">
+                <h5 class="modal-title" id="createRecordModalLabel">
+                    새 기록 작성
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
             </div>
-        </div>
-    </div>
 
-
-    <!-- 기록 생성 Modal -->
-    <div class="modal fade" id="createRecordModal" tabindex="-1" aria-labelledby="createRecordModalLabel"
-        aria-hidden="true">
-
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createRecordModalLabel">
-                        새 기록 작성
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                </div>
-
-                <form id="createRecordForm">
-                    <div class="modal-body">
-
-                        <!-- 기록 제목 -->
-                        <div class="mb-3">
-                            <label for="recordTitle" class="form-label">
-                                기록 제목
-                            </label>
-                            <input type="text" class="form-control" id="recordTitle" placeholder="새 기록" maxlength="200"
-                                required>
-                        </div>
-
-                        <!-- 기록 내용 -->
-                        <div class="mb-3">
-                            <label for="recordContent" class="form-label">
-                                기록 내용
-                            </label>
-                            <textarea class="form-control" id="recordContent" rows="6" required></textarea>
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-primary">
-                            기록 작성
-                        </button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- 기록 수정 Modal -->
-    <div class="modal fade" id="editRecordModal" tabindex="-1" aria-labelledby="editRecordModalLabel"
-        aria-hidden="true">
-
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editRecordModalLabel">
-                        기록 수정
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                </div>
-
-                <form id="editRecordForm">
-                    <div class="modal-body">
-
-                        <!-- 수정할 기록의 ID -->
-                        <input type="hidden" id="editRecordId">
-
-                        <!-- 기록 제목 -->
-                        <div class="mb-3">
-                            <label for="editRecordTitle" class="form-label">
-                                기록 제목
-                            </label>
-                            <input type="text" class="form-control" id="editRecordTitle" maxlength="200" required>
-                        </div>
-
-                        <!-- 기록 내용 -->
-                        <div class="mb-3">
-                            <label for="editRecordContent" class="form-label">
-                                기록 내용
-                            </label>
-                            <textarea class="form-control" id="editRecordContent" rows="6" required></textarea>
-                        </div>
-
-                        <!-- 숨김 여부 -->
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="editRecordIsHidden">
-                            <label class="form-check-label" for="editRecordIsHidden">
-                                이 기록 숨김 처리
-                            </label>
-                        </div>
-
-                        <div class="form-text">
-                            제목이나 내용을 수정하면 이전 내용이 수정 이력에 저장됩니다.
-                            숨김 상태 변경만으로는 수정 이력을 남기지 않습니다.
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                        <button type="submit" class="btn btn-primary">
-                            변경사항 저장
-                        </button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-
-
-    <!-- 기록 수정 이력 Modal -->
-    <div class="modal fade" id="recordHistoryModal" tabindex="-1" aria-labelledby="recordHistoryModalLabel"
-        aria-hidden="true">
-
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title" id="recordHistoryModalLabel">
-                        기록 수정 이력
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                </div>
-
+            <form id="createRecordForm">
                 <div class="modal-body">
 
-                    <!-- 조회 중인 기록 -->
-                    <h6 id="historyRecordTitle" class="mb-3">
-                        테스트 기록 A
-                    </h6>
-
-                    <!-- 수정 이력 목록 -->
-                    <div id="recordHistoryList" class="d-flex flex-column gap-3">
-                        <!-- 이곳에 추가 -->
+                    <!-- 기록 제목 -->
+                    <div class="mb-3">
+                        <label for="recordTitle" class="form-label">
+                            기록 제목
+                        </label>
+                        <input type="text" class="form-control" id="recordTitle" placeholder="새 기록" maxlength="100"
+                            required>
                     </div>
 
-                    <template id="recordHistoryTemplate">
-                        <div class="card">
-                            <div class="card-body">
-                                <p class="history-date text-muted small mb-2"></p>
-                                <h6 class="history-title mb-2"></h6>
-                                <p class="history-content mb-0" style="white-space: pre-wrap;"></p>
-                            </div>
-                        </div>
-                    </template>
+                    <!-- 기록 내용 -->
+                    <div class="mb-3">
+                        <label for="recordContent" class="form-label">
+                            기록 내용
+                        </label>
+                        <textarea class="form-control" id="recordContent" rows="6" required></textarea>
+                    </div>
 
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        닫기
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">
+                        기록 작성
                     </button>
                 </div>
+            </form>
 
-            </div>
         </div>
     </div>
+</div>
 
 
-    <!-- 프로젝트 설정 Modal -->
-    <div class="modal fade" id="projectSettingsModal" tabindex="-1" aria-labelledby="projectSettingsModalLabel"
-        aria-hidden="true">
+<!-- 기록 수정 Modal -->
+<div class="modal fade" id="editRecordModal" tabindex="-1" aria-labelledby="editRecordModalLabel" aria-hidden="true">
 
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
 
-                <div class="modal-header">
-                    <h5 class="modal-title" id="projectSettingsModalLabel">
-                        프로젝트 설정
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                </div>
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRecordModalLabel">
+                    기록 수정
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
 
+            <form id="editRecordForm">
                 <div class="modal-body">
 
-                    <!-- 프로젝트 설정 메뉴 -->
-                    <div id="projectSettingsMenu" class="d-flex flex-column gap-3">
+                    <!-- 수정할 기록의 ID -->
+                    <input type="hidden" id="editRecordId">
 
-                        <!-- 프로젝트 정보 수정 -->
-                        <button type="button" class="btn btn-outline-secondary text-start p-3" id="openProjectEdit">
-                            <i class="fas fa-pen me-2"></i>
-                            프로젝트 정보 수정
-                        </button>
+                    <!-- 기록 제목 -->
+                    <div class="mb-3">
+                        <label for="editRecordTitle" class="form-label">
+                            기록 제목
+                        </label>
+                        <input type="text" class="form-control" id="editRecordTitle" maxlength="100" required>
+                    </div>
 
-                        <!-- 참여 인원 관리 -->
-                        <button type="button" class="btn btn-outline-secondary text-start p-3" id="openProjectMembers">
-                            <i class="fas fa-users me-2"></i>
-                            참여 인원 관리
-                        </button>
+                    <!-- 기록 내용 -->
+                    <div class="mb-3">
+                        <label for="editRecordContent" class="form-label">
+                            기록 내용
+                        </label>
+                        <textarea class="form-control" id="editRecordContent" rows="6" required></textarea>
+                    </div>
 
-                        <!-- 초대 코드 -->
-                        <div>
-                            <label for="settingsProjectInviteCode" class="form-label">
-                                프로젝트 초대 코드
-                            </label>
+                    <!-- 숨김 여부 -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="editRecordIsHidden">
+                        <label class="form-check-label" for="editRecordIsHidden">
+                            이 기록 숨김 처리
+                        </label>
+                    </div>
 
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="settingsProjectInviteCode" value="ABCD-1234"
-                                    readonly>
+                    <div class="form-text">
+                        제목이나 내용을 수정하면 이전 내용이 수정 이력에 저장됩니다.
+                        숨김 상태 변경만으로는 수정 이력을 남기지 않습니다.
+                    </div>
 
-                                <button type="button" class="btn btn-outline-secondary" id="copyProjectInviteCode"
-                                    title="초대 코드 복사">
-                                    <i class="fas fa-copy"></i>
-                                </button>
+                </div>
 
-                                <button type="button" class="btn btn-outline-danger" id="regenerateProjectInviteCode"
-                                    title="초대 코드 재발급">
-                                    <i class="fas fa-rotate me-1"></i>
-                                    재발급
-                                </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="submit" class="btn btn-primary">
+                        변경사항 저장
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- 기록 수정 이력 Modal -->
+<div class="modal fade" id="recordHistoryModal" tabindex="-1" aria-labelledby="recordHistoryModalLabel"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="recordHistoryModalLabel">
+                    기록 수정 이력
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- 조회 중인 기록 -->
+                <h6 id="historyRecordTitle" class="mb-3">
+                    테스트 기록 A
+                </h6>
+
+                <!-- 수정 이력 목록 -->
+                <div id="recordHistoryList" class="d-flex flex-column gap-3">
+                    <!-- 이곳에 추가 -->
+                </div>
+
+                <template id="recordHistoryTemplate">
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="history-date text-muted small mb-2"></p>
+                            <h6 class="history-title mb-2"></h6>
+                            <p class="history-content mb-0" style="white-space: pre-wrap;"></p>
+                        </div>
+                    </div>
+                </template>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    닫기
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- 프로젝트 설정 Modal -->
+<div class="modal fade" id="projectSettingsModal" tabindex="-1" aria-labelledby="projectSettingsModalLabel"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="projectSettingsModalLabel">
+                    프로젝트 설정
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- 프로젝트 설정 메뉴 -->
+                <div id="projectSettingsMenu" class="d-flex flex-column gap-3">
+
+                    <!-- 프로젝트 정보 수정 -->
+                    <button type="button" class="btn btn-outline-secondary text-start p-3" id="openProjectEdit">
+                        <i class="fas fa-pen me-2"></i>
+                        프로젝트 정보 수정
+                    </button>
+
+                    <!-- 참여 인원 관리 -->
+                    <button type="button" class="btn btn-outline-secondary text-start p-3" id="openProjectMembers">
+                        <i class="fas fa-users me-2"></i>
+                        참여 인원 관리
+                    </button>
+
+                    <!-- 초대 코드 -->
+                    <div>
+                        <label for="settingsProjectInviteCode" class="form-label">
+                            프로젝트 초대 코드
+                        </label>
+
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="settingsProjectInviteCode" value="ABCD-1234"
+                                readonly>
+
+                            <button type="button" class="btn btn-outline-secondary" id="copyProjectInviteCode"
+                                title="초대 코드 복사">
+                                <i class="fas fa-copy"></i>
+                            </button>
+
+                            <button type="button" class="btn btn-outline-danger" id="regenerateProjectInviteCode"
+                                title="초대 코드 재발급">
+                                <i class="fas fa-rotate me-1"></i>
+                                재발급
+                            </button>
+                        </div>
+
+                        <div class="form-text">
+                            초대 코드를 재발급하면 기존 코드는 사용할 수 없습니다.
+                        </div>
+                    </div>
+
+                    <hr class="my-1">
+
+                    <!-- 프로젝트 나가기 -->
+                    <button type="button" class="btn btn-outline-danger text-start p-3" id="openProjectLeave">
+                        <i class="fas fa-right-from-bracket me-2"></i>
+                        프로젝트 나가기
+                    </button>
+
+                </div>
+
+
+                <!-- 프로젝트 정보 수정 -->
+                <div id="projectSettingsEdit" class="d-none">
+                    <form id="projectSettingsForm">
+
+                        <div class="mb-3">
+                            <label for="settingsProjectName" class="form-label">프로젝트명</label>
+                            <input type="text" class="form-control" id="settingsProjectName" maxlength="50" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="settingsProjectDescription" class="form-label">프로젝트 설명</label>
+                            <textarea class="form-control" id="settingsProjectDescription" rows="5"></textarea>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="settingsProjectDueDate" class="form-label">마감일</label>
+                                <input type="date" class="form-control" id="settingsProjectDueDate" required>
                             </div>
 
-                            <div class="form-text">
-                                초대 코드를 재발급하면 기존 코드는 사용할 수 없습니다.
+                            <div class="col-md-6">
+                                <label for="settingsProjectMaxMembers" class="form-label">최대 참여 인원</label>
+                                <input type="number" class="form-control" id="settingsProjectMaxMembers" min="1" max="99"
+                                    required>
                             </div>
                         </div>
 
-                        <hr class="my-1">
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-secondary settingsBack">
+                                뒤로
+                            </button>
 
-                        <!-- 프로젝트 나가기 -->
-                        <button type="button" class="btn btn-outline-danger text-start p-3" id="openProjectLeave">
-                            <i class="fas fa-right-from-bracket me-2"></i>
-                            프로젝트 나가기
-                        </button>
-
-                    </div>
-
-
-                    <!-- 프로젝트 정보 수정 -->
-                    <div id="projectSettingsEdit" class="d-none">
-                        <form id="projectSettingsForm">
-
-                            <div class="mb-3">
-                                <label for="settingsProjectName" class="form-label">프로젝트명</label>
-                                <input type="text" class="form-control" id="settingsProjectName" maxlength="50"
-                                    required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="settingsProjectDescription" class="form-label">프로젝트 설명</label>
-                                <textarea class="form-control" id="settingsProjectDescription" rows="5"></textarea>
-                            </div>
-
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="settingsProjectDueDate" class="form-label">마감일</label>
-                                    <input type="date" class="form-control" id="settingsProjectDueDate" required>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label for="settingsProjectMaxMembers" class="form-label">최대 참여 인원</label>
-                                    <input type="number" class="form-control" id="settingsProjectMaxMembers" min="1"
-                                        required>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between mt-4">
-                                <button type="button" class="btn btn-secondary settingsBack">
-                                    뒤로
-                                </button>
-
-                                <button type="submit" class="btn btn-primary">
-                                    변경사항 저장
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                            <button type="submit" class="btn btn-primary">
+                                변경사항 저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
 
-                    <!-- 프로젝트 인원 관리 -->
-                    <div id="projectSettingsMembers" class="d-none">
+                <!-- 프로젝트 인원 관리 -->
+                <div id="projectSettingsMembers" class="d-none">
 
-                        <!-- 현재 참여 인원 -->
-                        <div class="text-center mb-4">
-                            <h1 class="mb-1">프로젝트 참여 인원</h1>
+                    <!-- 현재 참여 인원 -->
+                    <div class="text-center mb-4">
+                        <h1 class="mb-1">프로젝트 참여 인원</h1>
 
-                            <h3>
-                                <span id="settingsCurrentMembers">0</span>
-                                /
-                                <span id="settingsMaxMembers">0</span>명
-                            </h3>
+                        <h3>
+                            <span id="settingsCurrentMembers">0</span>
+                            /
+                            <span id="settingsMaxMembers">0</span>명
+                        </h3>
                             <!--
                             <div class="progress mt-3" style="height: 8px;">
                                 <div class="progress-bar" id="settingsMembersProgress" role="progressbar"
                                     style="width: 0%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                                 </div>
                             </div>-->
-                        </div>
-
-                        <!-- 참여자 목록 -->
-                        <h5 class="mb-3">참여자 목록</h5>
-
-                        <div class="list-group mb-4" id="projectMemberList">
-                            <!-- JS를 통해 참여자 표시 -->
-                        </div>
-
-                        <!-- 뒤로가기 -->
-                        <div class="d-flex justify-content-start mt-4">
-                            <button type="button" class="btn btn-secondary settingsBack">
-                                뒤로
-                            </button>
-                        </div>
-
                     </div>
 
-                    <!-- 프로젝트 참여자 템플릿 -->
-                    <template id="projectMemberTemplate">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <!-- 참여자 목록 -->
+                    <h5 class="mb-3">참여자 목록</h5>
 
-                            <div class="d-flex align-items-center gap-3">
-                                <i class="fas fa-user-circle fa-lg text-secondary"></i>
+                    <div class="list-group mb-4" id="projectMemberList">
+                        <!-- JS를 통해 참여자 표시 -->
+                    </div>
 
-                                <div>
-                                    <div class="fw-bold memberName"></div>
-                                    <small class="text-muted memberRole"></small>
-                                </div>
-                            </div>
-
-                            <div>
-                                <button type="button" class="btn btn-outline-primary btn-sm transferAdminButton">
-                                    관리자 양도
-                                </button>
-
-                                <button type="button" class="btn btn-outline-danger btn-sm kickMemberButton">
-                                    강퇴
-                                </button>
-                            </div>
-                        </div>
-                    </template>
-
-
-                    <!-- 프로젝트 나가기 확인 -->
-                    <div id="projectSettingsLeave" class="d-none">
-
-                        <h3 class="mb-3">
-                            정말 이 프로젝트에서 나가시겠습니까?
-                        </h3>
-
-                        <h6 class="alert alert-warning">
-                            프로젝트에서 나가면 해당 프로젝트에 접근할 수 없게 됩니다.
-                            재참여를 위해선 초대 코드를 다시 입력해야 합니다.
-                        </h6>
-
-                        <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-secondary settingsBack">
-                                취소
-                            </button>
-
-                            <button type="button" class="btn btn-danger" id="confirmLeaveProject">
-                                프로젝트 나가기
-                            </button>
-                        </div>
+                    <!-- 뒤로가기 -->
+                    <div class="d-flex justify-content-start mt-4">
+                        <button type="button" class="btn btn-secondary settingsBack">
+                            뒤로
+                        </button>
                     </div>
 
                 </div>
+
+                <!-- 프로젝트 참여자 템플릿 -->
+                <template id="projectMemberTemplate">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-user-circle fa-lg text-secondary"></i>
+
+                            <div>
+                                <div class="fw-bold memberName"></div>
+                                <small class="text-muted memberRole"></small>
+                            </div>
+                        </div>
+
+                        <div>
+                            <button type="button" class="btn btn-outline-primary btn-sm transferAdminButton">
+                                관리자 양도
+                            </button>
+
+                            <button type="button" class="btn btn-outline-danger btn-sm kickMemberButton">
+                                강퇴
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+
+                <!-- 프로젝트 나가기 확인 -->
+                <div id="projectSettingsLeave" class="d-none">
+
+                    <h3 class="mb-3">
+                        정말 이 프로젝트에서 나가시겠습니까?
+                    </h3>
+
+                    <h6 class="alert alert-warning">
+                        프로젝트에서 나가면 해당 프로젝트에 접근할 수 없게 됩니다.
+                        재참여를 위해선 초대 코드를 다시 입력해야 합니다.
+                    </h6>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary settingsBack">
+                            취소
+                        </button>
+
+                        <button type="button" class="btn btn-danger" id="confirmLeaveProject">
+                            프로젝트 나가기
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-    
-    <script type="module" src="{{ url_for('static', filename='js/workspace_utils.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/project.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/task.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/record.js') }}"></script>
+<script>
+    window.projectId = {{ project_id | tojson }};
+</script>
+<script type="module" src="{{ url_for('static', filename='js/workspace_utils.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/task.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/record.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/project.js') }}"></script>
 {% endblock %}
