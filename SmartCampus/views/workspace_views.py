@@ -31,11 +31,8 @@ def stamp(value):
         return value
 
 # 에러 메세지
-def api_error(message, status=400, code=None):
+def api_error(message, status=400):
     data = {'error':message}
-    
-    if code is not None:
-        data['code'] = code
         
     return jsonify(data), status
 
@@ -135,7 +132,7 @@ def create_project():
         conn.rollback()
         
         if exc.args[0] == 1062 and 'invite_code' in str(exc).lower():
-            return api_error('초대 코드가 중복되었습니다.', 409, 'INVITE_CODE_DUPLICATE')
+            return api_error('초대 코드가 중복되었습니다.', 409)
         
         return api_error('중복된 데이터입니다.', 409)
     except Exception:
@@ -165,7 +162,7 @@ def join_project():
         
         if query('SELECT 1 FROM project_members WHERE project_id=%s AND user_id=%s', (p['id'], uid), one=True):
             conn.rollback()
-            return api_error('이미 참여 중입니다.', 409)
+            return api_error('이미 참여 중인 프로젝트입니다.', 409)
         
         count = query('SELECT COUNT(*) AS n FROM project_members WHERE project_id=%s', (p['id'],), one=True)['n']
         if count >= p['max_members']:
@@ -249,7 +246,7 @@ def regenerate_invite_code(pid):
         execute('UPDATE projects SET invite_code=%s WHERE id=%s', (code, pid))
     except pymysql.IntegrityError as exc:
         if exc.args[0] == 1062:
-            return api_error('초대 코드가 중복되었습니다.', 409, 'INVITE_CODE_DUPLICATE')
+            return api_error('초대 코드가 중복되었습니다.', 409)
         raise
     
     return jsonify({'ok': True})
