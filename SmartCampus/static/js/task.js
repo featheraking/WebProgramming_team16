@@ -1,5 +1,5 @@
 /* 공용 함수 가져오기 */
-import { getCurrentDateTime, currentUserId, Users } from "./workspace_utils.js";
+import { apiRequest, getProjectId, getCurrentDateTime, currentUserId, Users } from "./workspace_utils.js";
 
 
 /* 과제 관리 */
@@ -22,6 +22,8 @@ const statusColors = {
 };
 
 
+// 임시 데이터
+/*
 const tasks = [
     {
         id: crypto.randomUUID(),
@@ -60,8 +62,51 @@ const tasks = [
         notes: {}
     }
 ];
+*/
+
+let tasks = [];
+
+// 기존 변수명과 호환하기 위한 함수
+function normalizeTask(row) {
+    return {
+        id: row.id,
+        creatorId: row.created_by,
+        title: row.title,
+        description: row.content,
+        createdAt: row.created_date,
+        dueDate: row.due_date,
+        status: row.status,
+        isActive: Boolean(row.is_active),
+
+        assignees: row.assignees.map(member => member.user_id),
+
+        notes: Object.fromEntries(row.assignees.map(member => [member.user_id, member.comment ?? ""]))
+    };
+}
+
+export async function loadTasks() {
+    const projectId = getProjectId();
+
+    const data = await apiRequest(`/workspace/api/projects/${encodeURIComponent(projectId)}/tasks`);
+
+    tasks = data.map(normalizeTask);
+
+    renderTaskList();
+}
 
 
+// 담당자 목록 동적 생성
+export function setAssigneeOptions(selectId, members, includeAll = false) {
+    const select = document.getElementById(selectId);
+
+    select.replaceChildren();
+
+    if (includeAll) select.add(new Option("전체 담당자", "all"));
+
+    for (const member of members)
+        select.add(new Option(member.name, String(member.id)));
+
+}
 
 // 과제 상세 정보 렌더링
 
@@ -75,7 +120,8 @@ function renderTaskList() {
 
     // 필터값 가져오기
     const search = document.getElementById("taskSearch").value.trim().toLowerCase();
-    const assignee = document.getElementById("taskAssigneeFilter").value;
+    const assigneeOpt = document.getElementById("taskAssigneeFilter").value;
+    const assignee = assigneeOpt === "all" ? assigneeOpt : Number(assigneeOpt);
     const status = document.getElementById("taskStatusFilter").value;
     const hideInactive = document.getElementById("hideInactiveTasks").checked;
 
@@ -98,6 +144,7 @@ function renderTaskList() {
         return order === "asc" ? result : -result;
     });
 
+
     // 필터링 결과가 비어있는 경우
     if (filteredTasks.length === 0) {
         const tr = document.createElement("tr");
@@ -111,6 +158,7 @@ function renderTaskList() {
         taskList.appendChild(tr);
         return;
     }
+
 
     // 과제별 테이블 행 생성
     filteredTasks.forEach(task => {
@@ -152,6 +200,9 @@ function renderTaskList() {
         taskList.appendChild(tr);
     });
 }
+
+
+
 
 
 // 담당자별 작업 기록 카드 렌더링
@@ -201,7 +252,7 @@ function renderTaskNotes(task) {
 // 과제 생성
 const createTaskForm = document.getElementById("createTaskForm");
 
-createTaskForm.addEventListener("submit", event => {
+createTaskForm.addEventListener("submit", async event => {
     event.preventDefault();
 
     // 입력값 가져오기
@@ -210,37 +261,55 @@ createTaskForm.addEventListener("submit", event => {
     const dueDate = document.getElementById("taskDueDate").value;
 
     const assigneeSelect = document.getElementById("taskAssignees");
-    const assignees = Array.from(assigneeSelect.selectedOptions).map(option => option.value);
+    const assignees = Array.from(assigneeSelect.selectedOptions).map(option => Number(option.value));
 
+    // 과거 날짜를 마감일로 설정 불가
+    if (dueDate < getCurrentDateTime()) {
+        alert("지난 날짜를 과제 마감일로 설정할 수 없습니다.");
+        return;
+    }
 
-    // 새로운 과제 객체 생성
-    const newTask = {
-        id: crypto.randomUUID(),
-        creatorId: currentUserId,
-        title: title,
-        description: description,
-        assignees: assignees,
-        status: "todo",
-        createdAt: getCurrentDateTime(),
-        dueDate: dueDate,
-        isActive: true,
-        notes: {}
-    };
+    try {
+        // 과제 추가 요청
+        await apiRequest(`/workspace/api/projects/${getProjectId()}/tasks`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    id: crypto.randomUUID(),
+                    created_by: currentUserId,
+                    title: title,
+                    content: description,
+                    created_date: getCurrentDateTime(),
+                    due_date: dueDate,
+                    assignees: assignees
+                })
+            }
+        );
 
-    // 데이터 추가
-    tasks.push(newTask);
+        // 폼 초기화
+        createTaskForm.reset();
+
+        // Modal 닫기
+        //const modalElement = document.getElementById("createTaskModal");
+        //const modal = bootstrap.Modal.getInstance(modalElement);
+        //modal.hide();
+        bootstrap.Modal.getInstance(document.getElementById("createTaskModal")).hide();
+    }
+    catch (error) {
+        alert("과제 추가에 실패하였습니다." + `\n${error.message}`);
+        return;
+    }
 
     // 목록 갱신
-    renderTaskList();
+    //renderTaskList();
+    try {
+        await loadTasks();
+    }
+    catch (error) {
+        alert("목록 갱신에 실패하였습니다." + `\n${error.message}`);
+        return;
+    }
 
-    // Modal 닫기
-    const modalElement = document.getElementById("createTaskModal");
-    const modal = bootstrap.Modal.getInstance(modalElement);
-
-    modal.hide();
-
-    // 폼 초기화
-    createTaskForm.reset();
 });
 
 
@@ -316,7 +385,7 @@ editTaskModal.addEventListener("show.bs.modal", event => {
     const assigneeSelect = document.getElementById("editTaskAssignees");
 
     Array.from(assigneeSelect.options).forEach(option => {
-        option.selected = task.assignees.includes(option.value);
+        option.selected = task.assignees.includes(Number(option.value));
     });
 
     editTaskIsActive = task.isActive ?? true;
@@ -346,7 +415,7 @@ taskActiveButton.addEventListener("click", () => {
 
 
 // 과제 상세 정보 수정 - 데이터 수정하기
-document.getElementById("editTaskForm").addEventListener("submit", event => {
+document.getElementById("editTaskForm").addEventListener("submit", async event => {
     event.preventDefault();
 
     // 수정할 과제 찾기
@@ -366,30 +435,56 @@ document.getElementById("editTaskForm").addEventListener("submit", event => {
 
     // 담당자 다중 선택
     const assigneeSelect = document.getElementById("editTaskAssignees");
-    const assignees = Array.from(assigneeSelect.selectedOptions).map(option => option.value);
+    const assignees = Array.from(assigneeSelect.selectedOptions).map(option => Number(option.value));
 
-    // 기존 과제 객체 수정
-    task.title = title;
-    task.description = description;
-    task.dueDate = dueDate;
-    task.status = status;
-    task.assignees = assignees;
-    task.isActive = editTaskIsActive;
+    // 과거 날짜를 마감일로 설정 불가
+    if (dueDate < getCurrentDateTime()) {
+        alert("과제 마감일로 설정할 수 없는 날짜입니다.");
+        return;
+    }
+
+    try {
+        // 기존 과제 객체 수정
+        await apiRequest(`/workspace/api/projects/${getProjectId()}/tasks/${taskId}`,
+            {
+                method: "PATCH",
+                body: JSON.stringify({
+                    title: title,
+                    content: description,
+                    due_date: dueDate,
+                    status: status,
+                    assignees: assignees,
+                    is_active: editTaskIsActive
+                })
+            }
+        );
+
+        // Modal 닫기
+        const modalElement = document.getElementById("editTaskModal");
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
+    }
+    catch (error) {
+        alert("과제 수정에 실패하였습니다." + `\n${error.message}`);
+        return;
+    }
 
     // 과제 목록 화면 갱신
-    renderTaskList();
-
-    // Modal 닫기
-    const modalElement = document.getElementById("editTaskModal");
-    const modal = bootstrap.Modal.getInstance(modalElement);
-    modal.hide();
+    //renderTaskList();
+    try {
+        await loadTasks();
+    }
+    catch (error) {
+        alert("목록 갱신에 실패하였습니다." + `\n${error.message}`);
+        return;
+    }
 });
 
 
 // 담당자별 코멘트 수정하기
 const taskNoteList = document.getElementById("task-note-list");
 
-taskNoteList.addEventListener("click", event => {
+taskNoteList.addEventListener("click", async event => {
     const button = event.target.closest("button");
     if (!button) return;
 
@@ -402,7 +497,7 @@ taskNoteList.addEventListener("click", event => {
 
     if (!task) return;
 
-    const userId = card.dataset.userId;
+    const userId = Number(card.dataset.userId);
 
     const view = card.querySelector(".task-note-view");
     const edit = card.querySelector(".task-note-edit");
@@ -428,15 +523,32 @@ taskNoteList.addEventListener("click", event => {
     if (button.matches(".save-task-note")) {
         const newContent = input.value;
 
-        // 데이터 저장
-        task.notes ??= {};
-        task.notes[userId] = newContent;
+        try {
+            // 수정 요청
+            await apiRequest(`/workspace/api/projects/${getProjectId()}/tasks/${taskId}/memo`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        comment: newContent
+                    })
+                }
+            );
 
-        // 화면 갱신
-        content.textContent = newContent;
+            // 데이터 저장
+            task.notes ??= {};
+            task.notes[userId] = newContent;
 
-        edit.classList.add("d-none");
-        view.classList.remove("d-none");
+            // 화면 갱신
+            content.textContent = newContent;
+
+            edit.classList.add("d-none");
+            view.classList.remove("d-none");
+        }
+        catch (error) {
+            alert(error.message);
+            return;
+        }
+
     }
 });
 
@@ -472,4 +584,5 @@ document.getElementById("resetTaskFilter").addEventListener("click", () => {
 })
 
 // 초기 렌더링
-renderTaskList();
+//renderTaskList();
+// project.js에서 프로젝트를 불러올 때 한 번에 해결

@@ -1,9 +1,9 @@
 // 공용 함수 가져오기
-import { generateInviteCode, getCurrentDateTime, currentUserId, Users } from "./workspace_utils.js";
+import { apiRequest, generateInviteCode, getCurrentDateTime, currentUserId, loadCurrentUser } from "./workspace_utils.js";
 
 
 // 임시 프로젝트 데이터
-
+/*
 const projects = [
     {
         id: crypto.randomUUID(),
@@ -17,28 +17,132 @@ const projects = [
         maxMembers: 5,
         taskCount: 0
     }
-];
+];*/
+
+
+let projects = [];
+
+// 기존 변수명들과 호환하기 위한 함수
+function normalizeProject(row) {
+    return {
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        createdAt: row.created_date,
+        dueDate: row.due_date,
+        adminId: row.owner_id,
+        inviteCode: row.invite_code,
+        maxMembers: row.max_members,
+        taskCount: row.task_count,
+        memberCount: row.member_count
+    };
+}
+
+
+async function loadProjects() {
+    const data = await apiRequest("/workspace/api/projects");
+
+    projects = data.map(normalizeProject);
+
+    renderProjects();
+}
 
 
 //프로젝트 생성
-function createProject(data) {
-    const newProject = {
-        id: crypto.randomUUID(),
-        name: data.name,
-        description: data.description,
-        createdAt: getCurrentDateTime(),
-        dueDate: data.dueDate,
-        adminId: currentUserId,
-        inviteCode: generateInviteCode(),
-        maxMembers: data.maxMembers,
-        currentMembers: [currentUserId],
-        taskCount: 0
-    };
+async function createProject(data) {
+    const projId = crypto.randomUUID();
+    const createdDate = getCurrentDateTime();
 
-    projects.push(newProject);
+    for (let i = 0; i < 10; i++) {
+        const invCode = generateInviteCode();
 
-    return newProject;
+        try {
+            const proj = await apiRequest("/workspace/api/projects", {
+                method: "POST",
+                body: JSON.stringify({
+                    id: projId,
+                    name: data.name,
+                    description: data.description,
+                    created_date: createdDate,
+                    due_date: data.dueDate,
+                    owner_id: currentUserId,
+                    invite_code: invCode,
+                    max_members: data.maxMembers
+                })
+            });
+
+            // 프로젝트 목록 갱신
+            await loadProjects();
+
+            return proj;
+        }
+        catch (error) {
+            if (error.status !== 409 || error.code !== "INVITE_CODE_DUPLICATE")
+                throw error;
+        }
+    }
+
+    throw new Error("프로젝트 생성에 실패하였습니다.");
 }
+
+
+// 프로젝트 생성 폼
+const createProjectForm = document.getElementById("createProjectForm");
+
+createProjectForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    // 값 받아오기
+    const name = document.getElementById("projectName").value.trim();
+    const description = document.getElementById("projectDescription").value.trim();
+    const dueDate = document.getElementById("projectDueDate").value;
+    const maxMembers = Number(document.getElementById("projectMaxMembers").value);
+
+    // 입력값 검사
+    if (!Number.isInteger(maxMembers) || maxMembers < 1 || maxMembers > 99) {
+        alert("최대 참여 인원을 올바르게 입력해주세요.");
+        return;
+    }
+
+    if (dueDate < getCurrentDateTime()) {
+        alert("지난 날짜를 프로젝트 마감일로 설정할 수 없습니다.");
+        return;
+    }
+
+    const submitButton = createProjectForm.querySelector('button[type="submit"]');
+    try {
+        // 제출 버튼 임시 비활성화 (중복 제출 방지)
+        if (submitButton) submitButton.disabled = true;
+
+        // 새 프로젝트 생성
+        await createProject({ name, description, dueDate, maxMembers });
+
+    }
+    catch (error) {
+        alert("새 프로젝트 생성에 실패하였습니다" + `\n${error.message}`);
+        return;
+    }
+    finally {
+        if (submitButton) submitButton.disabled = false;
+    }
+
+    // 입력 폼 초기화
+    createProjectForm.reset();
+
+    // Modal 닫기
+    const modalElement = document.getElementById("createProjectModal");
+    bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+
+    // 목록 갱신
+    try {
+        // renderProjects();
+        await loadProjects();
+    }
+    catch (error) {
+        alert("목록 갱신에 실패하였습니다." + `\n${error.message}`);
+        return;
+    }
+});
 
 
 // 프로젝트 카드 생성
@@ -64,13 +168,43 @@ function createProjectCard(project) {
     card.querySelector(".task-count").textContent = `과제 ${project.taskCount}개`;
 
     // 참여 인원
-    card.querySelector(".member-count").textContent = `참여자 ${project.currentMembers.length}/${project.maxMembers}명`;
+    card.querySelector(".member-count").textContent = `참여자 ${project.memberCount}/${project.maxMembers}명`;
 
     // 프로젝트 상세 페이지 이동
     card.querySelector(".projectEnter").href = `/workspace/project/${encodeURIComponent(project.id)}`;
 
     return card;
 }
+
+
+// 프로젝트 참가
+document.getElementById("joinProjectForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const inviteCode = document.getElementById("projectJoinCode").value.trim();
+    if (!inviteCode) {
+        alert("초대 코드를 입력해주세요.");
+        return;
+    }
+
+    try {
+        await apiRequest("/workspace/api/projects/join", {
+            method: "POST",
+            body: JSON.stringify({
+                invite_code: inviteCode
+            })
+        });
+
+        event.target.reset();
+
+        await loadProjects();
+
+        alert("프로젝트에 참여했습니다.");
+    }
+    catch (error) {
+        alert(error.message);
+    }
+});
 
 
 // 프로젝트 필터링 및 정렬
@@ -126,38 +260,7 @@ function renderProjects() {
 }
 
 
-// 프로젝트 생성 폼
-const createProjectForm = document.getElementById("createProjectForm");
 
-createProjectForm.addEventListener("submit", event => {
-    event.preventDefault();
-
-    // 값 받아오기
-    const name = document.getElementById("projectName").value.trim();
-    const description = document.getElementById("projectDescription").value.trim();
-    const dueDate = document.getElementById("projectDueDate").value;
-    const maxMembers = Number(document.getElementById("projectMaxMembers").value);
-
-    // 입력값 검사
-    if (!Number.isInteger(maxMembers) || maxMembers < 1) {
-        alert("최대 참여 인원을 올바르게 입력해주세요.");
-        return;
-    }
-
-    // 새 프로젝트 생성
-    createProject({ name, description, dueDate, maxMembers });
-
-    // 목록 갱신
-    renderProjects();
-
-    // 입력 폼 초기화
-    createProjectForm.reset();
-
-    // Modal 닫기
-    const modalElement = document.getElementById("createProjectModal");
-
-    bootstrap.Modal.getOrCreateInstance(modalElement).hide();
-});
 
 
 // 프로젝트 검색 & 필터 이벤트
@@ -180,4 +283,11 @@ document.getElementById("resetProjectFilters").addEventListener("click", () => {
 
 
 // 초기 렌더링
-renderProjects();
+try {
+    await loadCurrentUser();
+    await loadProjects();
+}
+catch (error) {
+    alert("프로젝트 목록 불러오기 실패" + `\n${error.message}`);
+}
+

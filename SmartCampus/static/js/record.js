@@ -1,12 +1,12 @@
 // 공용 가져오기
-import { getCurrentDateTime, currentUserId, Users } from "./workspace_utils.js";
+import { apiRequest, getProjectId, getCurrentDateTime, currentUserId, Users } from "./workspace_utils.js";
 
 
-// 하위 기록을 펼칠 때 끊어서 보여주는 개수
-const recordPageSize = 4;
+
 
 
 // 임시 데이터
+/*
 const initialRecords = [
     {
         id: "record1",
@@ -33,13 +33,40 @@ const initialRecords = [
         children: []
     }
 ];
-
+*/
 
 // 저장/불러오기 및 기본 유틸리티
-let records = structuredClone(initialRecords);
+//let records = structuredClone(initialRecords);
+let records = [];
+
 let openRecordId = null;
 const childPageCounts = {};  // 부모 기록별 현재 표시 개수
 let hideOtherHiddenRecords = false;
+
+const recordPageSize = 4; // 하위 기록을 펼칠 때 끊어서 보여주는 개수
+
+// 기존 변수명과 호환하기 위하 함수
+function normalizeRecord(row) {
+    return {
+        id: row.id,
+        title: row.title,
+        content: row.content,
+        authorId: row.author_id,
+        createdAt: row.created_at,
+        isHidden: Boolean(row.is_hidden),
+
+        history: [],
+
+        children: (row.children ?? []).map(child => ({
+            id: child.id,
+            authorId: child.author_id,
+            content: child.content,
+            createdAt: child.created_at,
+            editedAt: child.edited_at,
+            isHidden: Boolean(child.is_hidden)
+        }))
+    };
+}
 
 const recordList = document.getElementById("record-list");
 const createRecordModal = document.getElementById("createRecordModal");
@@ -58,6 +85,16 @@ function findRecord(id) {
     return records.find(record => record.id === id);
 }
 
+
+export async function loadRecords() {
+    const projectId = getProjectId();
+
+    const data = await apiRequest(`/workspace/api/projects/${encodeURIComponent(projectId)}/records`);
+
+    records = data.map(normalizeRecord);
+
+    renderRecordList();
+}
 
 // 하위 기록 카드 생성
 function renderChildRecord(child) {
@@ -127,7 +164,7 @@ function renderChildrenIntoCard(card, record) {
 
     const children = (record.children ?? []).map((child, index) => ({ child, index }))
         .filter(({ child }) => isVisibleRecord(child))
-        .sort((a, b) => { b.child.createdAt.localeCompare(a.child.createdAt) || b.index - a.index });
+        .sort((a, b) => { return b.child.createdAt.localeCompare(a.child.createdAt) || b.index - a.index });
 
     const count = childPageCounts[record.id] ?? recordPageSize;
 
@@ -237,7 +274,7 @@ function renderParentRecord(record) {
 function renderRecordList() {
     recordList.replaceChildren();
     const visible = records.filter(isVisibleRecord).map((record, index) => ({ record, index }))
-        .sort((a, b) => { b.record.createdAt.localeCompare(a.record.createdAt) || b.index - a.index });
+        .sort((a, b) => { return b.record.createdAt.localeCompare(a.record.createdAt) || b.index - a.index });
 
     // 보여줄 기록이 없을 때
     if (visible.length === 0) {
@@ -260,12 +297,13 @@ function renderRecordList() {
 // 상위 기록 생성
 const createRecordForm = document.getElementById("createRecordForm");
 
-createRecordForm.addEventListener("submit", event => {
+createRecordForm.addEventListener("submit", async event => {
     event.preventDefault();
 
     const title = document.getElementById("recordTitle").value.trim();
     const content = document.getElementById("recordContent").value.trim();
 
+    /*
     records.push({
         id: crypto.randomUUID(),
         title: title,
@@ -276,12 +314,40 @@ createRecordForm.addEventListener("submit", event => {
         history: [],
         children: []
     });
+    */
 
-    renderRecordList();
+    try {
+        await apiRequest(`/workspace/api/projects/${getProjectId()}/records`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    id: crypto.randomUUID(),
+                    title: title,
+                    content: content,
+                    author_id: currentUserId,
+                    created_at: getCurrentDateTime()
+                })
+            }
+        );
 
-    bootstrap.Modal.getInstance(createRecordModal)?.hide();
+        bootstrap.Modal.getInstance(createRecordModal)?.hide();
 
-    createRecordForm.reset();
+        createRecordForm.reset();
+    }
+    catch (error) {
+        alert("기록 생성에 실패하였습니다." + `\n${error.message}`);
+        return;
+    }
+
+    // 목록 갱신
+    //renderRecordList();
+    try {
+        await loadRecords();
+    }
+    catch (error) {
+        alert("목록 갱신에 실패하였습니다." + `\n${error.message}`);
+        return;
+    }
 });
 
 
@@ -297,7 +363,7 @@ function openEditRecordModal(record) {
     bootstrap.Modal.getOrCreateInstance(editRecordModal).show();
 }
 
-document.getElementById("editRecordForm").addEventListener("submit", event => {
+document.getElementById("editRecordForm").addEventListener("submit", async event => {
     event.preventDefault();
 
     const record = findRecord(document.getElementById("editRecordId").value);
@@ -318,29 +384,54 @@ document.getElementById("editRecordForm").addEventListener("submit", event => {
         return;
     }
 
-    // 수정 이력 등록
-    if (title !== record.title || content !== record.content) {
-        record.history ??= [];
-        record.history.push({
-            recordId: record.id,
-            previousTitle: record.title,
-            previousContent: record.content,
-            editedAt: getCurrentDateTime()
-        });
+    try {
+        // 수정 이력 등록
+        if (title !== record.title || content !== record.content || isHidden !== record.isHidden) {
+            await apiRequest(`/workspace/api/projects/${getProjectId()}/records/${record.id}`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        title: title,
+                        content: content,
+                        is_hidden: isHidden
+                    })
+                }
+            );
+        }
+
+        // 수정 반영
+        //record.title = title;
+        //record.content = content;
+        //record.isHidden = isHidden;
+
+        bootstrap.Modal.getInstance(editRecordModal)?.hide();
+    }
+    catch (error) {
+        alert(error.message);
     }
 
-    // 수정 반영
-    record.title = title;
-    record.content = content;
-    record.isHidden = isHidden;
-
-    renderRecordList();
-
-    bootstrap.Modal.getInstance(editRecordModal)?.hide();
+    // 목록 갱신
+    //renderRecordList();
+    try {
+        await loadRecords();
+    }
+    catch (error) {
+        alert("목록 갱신에 실패하였습니다." + `\n${error.message}`);
+    }
 });
 
 // 상위 기록 수정 이력
-function openHistoryModal(record) {
+async function loadRecordHistory(recordId) {
+    const data = await apiRequest(`/workspace/api/projects/${getProjectId()}/records/${recordId}/history`);
+
+    return data.map(item => ({
+        previousTitle: item.old_title,
+        previousContent: item.old_content,
+        editedAt: item.edited_at
+    }));
+}
+
+async function openHistoryModal(record) {
     document.getElementById("historyRecordTitle").textContent = record.title;
 
     const list = document.getElementById("recordHistoryList");
@@ -348,7 +439,8 @@ function openHistoryModal(record) {
 
     list.replaceChildren();
 
-    const history = [...(record.history ?? [])].reverse();
+    //const history = [...(record.history ?? [])].reverse();
+    const history = await loadRecordHistory(record.id);
 
     if (history.length === 0) {
         const message = document.createElement("p");
@@ -376,7 +468,7 @@ function openHistoryModal(record) {
 
 
 /* 기록 목록 버튼 이벤트 처리 */
-recordList.addEventListener("click", event => {
+recordList.addEventListener("click", async event => {
     // 클릭한 버튼 찾기
     const button = event.target.closest("button[data-action]");
     if (!button || !recordList.contains(button)) return;
@@ -409,7 +501,7 @@ recordList.addEventListener("click", event => {
 
     // 상위 기록 수정 이력 조회
     if (action === "history-parent") {
-        openHistoryModal(record);
+        await openHistoryModal(record);
         return;
     }
 
@@ -423,8 +515,8 @@ recordList.addEventListener("click", event => {
             return;
         }
 
+        /*
         record.children ??= [];
-
         record.children.push({
             id: crypto.randomUUID(),
             authorId: currentUserId,
@@ -432,13 +524,38 @@ recordList.addEventListener("click", event => {
             createdAt: getCurrentDateTime(true),
             editedAt: null,
             isHidden: false
-        });
+        });*/
+        try {
+            await apiRequest(`/workspace/api/projects/${getProjectId()}/records/${record.id}/children`,
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        id: crypto.randomUUID(),
+                        author_id: currentUserId,
+                        content: content,
+                        created_at: getCurrentDateTime(true)
+                    })
+                }
+            );
 
-        // 새로 작성한 하위 기록이 보이도록 자동 펼치기
-        childPageCounts[record.id] = recordPageSize;
-        openRecordId = record.id;
+            // 새로 작성한 하위 기록이 보이도록 자동 펼치기
+            childPageCounts[record.id] = recordPageSize;
+            openRecordId = record.id;
+        }
+        catch (error) {
+            alert("하위 기록 생성에 실패하였습니다." + `\n${error.message}`);
+            return;
+        }
 
-        renderRecordList();
+        // 목록 갱신
+        //renderRecordList();
+        try {
+            await loadRecords();
+        }
+        catch (error) {
+            alert("목록 갱신에 실패하였습니다." + `\n${error.message}`);
+        }
+
         return;
     }
 
@@ -498,21 +615,76 @@ recordList.addEventListener("click", event => {
             return;
         }
 
-        // 수정 시각 갱신
-        if (child.content !== content) {
-            child.content = content;
-            child.editedAt = getCurrentDateTime(true);
+        // 임시 비활성화 (중복 제출 방지)
+        button.disabled = true;
+
+        try {
+            await apiRequest(`/workspace/api/projects/${getProjectId()}/children/${childId}`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        content: content
+                    })
+                }
+            );
+
+            // 수정 시각 갱신
+            /*
+            if (child.content !== content) {
+                child.content = content;
+                child.editedAt = getCurrentDateTime(true);
+            }*/
+        }
+        catch (error) {
+            alert("수정에 실패했습니다." + `\n${error.message}`);
+            return;
+        }
+        finally {
+            button.disabled = false;
         }
 
-        renderRecordList();
+        // 목록 갱신
+        //renderRecordList();
+        try {
+            await loadRecords();
+        }
+        catch (error) {
+            alert("목록 갱신에 실패하였습니다." + `\n${error.message}`);
+        }
+
         return;
     }
 
     // 하위 기록 숨김/숨김 해제
     if (action === "toggle-child-hidden") {
-        child.isHidden = !child.isHidden;
+        //child.isHidden = !child.isHidden;
 
-        renderRecordList();
+        try {
+            await apiRequest(
+                `/workspace/api/projects/${getProjectId()}/children/${child.id}/hidden`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        is_hidden: !child.isHidden
+                    })
+                }
+            );
+        }
+        catch (error) {
+            alert("숨김/숨김 해제에 실패하였습니다." + `\n${error.message}`);
+            return;
+        }
+
+
+        // 목록 갱신
+        //renderRecordList();
+        try {
+            await loadRecords();
+        }
+        catch (error) {
+            alert("목록 갱신에 실패하였습니다." + `\n${error.message}`);
+        }
+
         return;
     }
 });
@@ -528,4 +700,5 @@ hideOtherHiddenRecordsInput.addEventListener("change", () => {
 
 
 // 최초 렌더링
-renderRecordList();
+//renderRecordList();
+// project.js에서 프로젝트를 불러올 때 한 번에 해결

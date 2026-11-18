@@ -1,12 +1,56 @@
-/* 임시 공용 데이터 */
-export const currentUserId = "user1";
+/* 프로젝트 id 받아오기 */
+export function getProjectId() {
+    return window.projectId ?? null;
+}
 
-export const Users = {
-    user1: "팀원 A",
-    user2: "팀원 B",
-    user3: "팀원 C",
-    user4: "팀원 D"
-};
+/* Flask 통신용 함수 */
+export async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        ...options,
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+            ...options.headers
+        }
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+        const err = new Error(data?.error || `요청 실패 (${response.status})`);
+
+        err.status = response.status;
+        err.code = data?.code;
+
+        throw err;
+    }
+
+    return data;
+}
+
+/* 현재 유저값 받아오기 */
+export let currentUserId = null;
+
+export async function loadCurrentUser() {
+    const data = await apiRequest("/auth/me");
+
+    currentUserId = data?.user ? Number(data.user.id) : null;
+
+    return data.user;
+}
+
+/* 프로젝트 참여자 명단 받아오기 */
+export let Users = {};
+
+export function setUsers(members) {
+    for (const key of Object.keys(Users)) {
+        delete Users[key];
+    }
+
+    for (const member of members) {
+        Users[member.id] = member.name;
+    }
+}
 
 
 /* 현재 날짜 및 시간 반환 */
@@ -16,7 +60,7 @@ export function getCurrentDateTime(includeTime = false) {
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, "0");
     const day = String(now.getDate()).padStart(2, "0");
-    
+
     const date = `${year}-${month}-${day}`;
 
     if (!includeTime) {
