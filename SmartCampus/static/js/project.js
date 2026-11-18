@@ -439,7 +439,7 @@ document.getElementById("regenerateProjectInviteCode").addEventListener("click",
             break;
         }
         catch (error) {
-            if (error.status !== 409 || error.code !== "INVITE_CODE_DUPLICATE") throw error;
+            if (error.status !== 409) throw error;
         }
     }
     if (!successed) throw new Error("초대 코드 재발급에 실패하였습니다.");

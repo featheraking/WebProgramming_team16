@@ -101,7 +101,7 @@ export function setAssigneeOptions(selectId, members, includeAll = false) {
 
     select.replaceChildren();
 
-    if (includeAll) select.add(new Option("전체 담당자", "all"));
+    if (includeAll) select.add(new Option("전체", "all"));
 
     for (const member of members)
         select.add(new Option(member.name, String(member.id)));

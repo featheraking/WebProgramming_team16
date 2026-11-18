@@ -224,7 +224,7 @@ function renderParentRecord(record) {
         const hiddenBadge = document.createElement("span");
 
         hiddenBadge.className = "badge bg-secondary ms-2";
-        hiddenBadge.textContent = "숨김";
+        hiddenBadge.textContent = "숨겨짐";
 
         card.querySelector(".record-created-at").appendChild(hiddenBadge);
     }
@@ -690,7 +690,7 @@ recordList.addEventListener("click", async event => {
 });
 
 
-// 타인의 숨김 기록 자체를 감추기
+// 타인의 숨겨진 기록 자체를 감추기
 const hideOtherHiddenRecordsInput = document.getElementById("hideOtherHiddenRecords");
 
 hideOtherHiddenRecordsInput.addEventListener("change", () => {

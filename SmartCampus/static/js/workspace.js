@@ -77,7 +77,7 @@ async function createProject(data) {
             return proj;
         }
         catch (error) {
-            if (error.status !== 409 || error.code !== "INVITE_CODE_DUPLICATE")
+            if (error.status !== 409)
                 throw error;
         }
     }
@@ -199,7 +199,7 @@ document.getElementById("joinProjectForm").addEventListener("submit", async even
 
         await loadProjects();
 
-        alert("프로젝트에 참여했습니다.");
+        //alert("프로젝트에 참여했습니다.");
     }
     catch (error) {
         alert(error.message);
