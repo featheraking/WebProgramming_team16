@@ -96,6 +96,7 @@
             form.classList.remove('was-validated');
             hideLoginDropdown();
             setUser(user);
+            goToNextPage();
         });
     }
 
@@ -132,15 +133,35 @@
             }
             bootstrap.Modal.getOrCreateInstance(modalEl).hide();
             setUser(user);
+            goToNextPage();
         });
     }
 
-    window.SCH = { getUser };
+    // 로그인이 필요한 페이지에서 홈으로 온 경우(?login=1&next=...): 로그인 창 열기 → 로그인 후 원래 페이지로
+    function nextPage() {
+        const next = new URLSearchParams(location.search).get('next') || '';
+        return next.startsWith('/') && !next.startsWith('//') ? next : null;
+    }
+
+    function goToNextPage() {
+        const next = nextPage();
+        if (next) location.href = next;
+    }
+
+    function openLoginIfRequired() {
+        if (currentUser || !new URLSearchParams(location.search).has('login')) return;
+        const toggle = document.querySelector('#schGuest [data-bs-toggle="dropdown"]');
+        if (toggle) bootstrap.Dropdown.getOrCreateInstance(toggle).show();
+        showMessage(document.getElementById('schLoginError'), '로그인이 필요한 페이지예요. 로그인해 주세요.');
+    }
+
+    window.SCH = { getUser, setUser };
 
     window.addEventListener('DOMContentLoaded', () => {
         markActiveMenu();
         initLogin();
         initRegister();
         renderAuth();
+        openLoginIfRequired();
     });
 })();

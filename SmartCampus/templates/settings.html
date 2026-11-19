@@ -4,8 +4,87 @@
 
 {% block content %}
                     <div class="container-fluid px-4">
-                        <!-- TODO(인증): 내 정보 수정, 학과·학기 입력, 비밀번호 변경 -->
-                        <h1 class="mt-4">설정</h1>
-                        <p class="text-muted">준비 중인 페이지입니다.</p>
+                        <h1 class="mt-4 h3 fw-bold">설정</h1>
+                        <p class="text-muted mb-4">내 정보와 비밀번호를 바꿀 수 있어요. 학과·학기는 홈 화면 배너에 표시돼요.</p>
+
+                        <div class="row g-4 mb-4">
+                            <!-- 내 정보 -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <h2 class="h5 fw-bold mb-3"><i class="fas fa-user me-2"></i>내 정보</h2>
+                                        <div class="alert d-none py-2 small" id="profileMessage" role="alert"></div>
+                                        <form id="profileForm" method="post" action="{{ url_for('auth.update_profile') }}" novalidate>
+                                            <div class="row g-2">
+                                                <div class="col-6 mb-3">
+                                                    <label class="form-label small text-muted" for="setUsername">아이디</label>
+                                                    <input class="form-control" id="setUsername" type="text" value="{{ user.username }}" disabled />
+                                                </div>
+                                                <div class="col-6 mb-3">
+                                                    <label class="form-label small text-muted" for="setStudentId">학번</label>
+                                                    <input class="form-control" id="setStudentId" type="text" value="{{ user.studentId }}" disabled />
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="setName">이름</label>
+                                                <input class="form-control" id="setName" name="name" type="text" value="{{ user.name }}" maxlength="50" required />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="setEmail">이메일</label>
+                                                <input class="form-control" id="setEmail" name="email" type="email" value="{{ user.email }}" maxlength="100" required />
+                                            </div>
+                                            <div class="row g-2">
+                                                <div class="col-sm-7 mb-3">
+                                                    <label class="form-label" for="setDepartment">학과</label>
+                                                    <input class="form-control" id="setDepartment" name="department" type="text" value="{{ user.department or '' }}" maxlength="50" placeholder="예: AI소프트웨어학부" />
+                                                </div>
+                                                <div class="col-sm-5 mb-3">
+                                                    <label class="form-label" for="setSemester">학기</label>
+                                                    <select class="form-select" id="setSemester" name="semester">
+                                                        <option value="">선택 안 함</option>
+                                                        {% for year in range(2025, 2029) %}
+                                                            {% for term in ['1학기', '2학기'] %}
+                                                                {% set value = year ~ '년 ' ~ term %}
+                                                                <option value="{{ value }}" {% if user.semester == value %}selected{% endif %}>{{ value }}</option>
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-primary w-100" type="submit">저장</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 비밀번호 변경 -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <h2 class="h5 fw-bold mb-3"><i class="fas fa-lock me-2"></i>비밀번호 변경</h2>
+                                        <div class="alert d-none py-2 small" id="passwordMessage" role="alert"></div>
+                                        <form id="passwordForm" method="post" action="{{ url_for('auth.change_password') }}" novalidate>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="currentPassword">현재 비밀번호</label>
+                                                <input class="form-control" id="currentPassword" name="current_password" type="password" autocomplete="current-password" required />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="newPassword">새 비밀번호 (8자 이상)</label>
+                                                <input class="form-control" id="newPassword" name="new_password" type="password" autocomplete="new-password" minlength="8" required />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="newPasswordConfirm">새 비밀번호 확인</label>
+                                                <input class="form-control" id="newPasswordConfirm" name="new_password_confirm" type="password" autocomplete="new-password" required />
+                                            </div>
+                                            <button class="btn btn-outline-primary w-100" type="submit">비밀번호 변경</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+{% endblock %}
+
+{% block scripts %}
+        <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 {% endblock %}

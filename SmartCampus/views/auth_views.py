@@ -10,7 +10,6 @@ from db import execute, query
 
 bp = Blueprint('auth', __name__)
 
-
 USER_COLUMNS = 'id, username, name, student_id, email, department, semester'
 
 
@@ -50,16 +49,29 @@ def inject_current_user():
     except pymysql.MySQLError:
         return {'current_user': None}
 
+def wants_json():
+    return request.path.startswith('/api/') or request.accept_mimetypes.best == 'application/json'
 
 def login_required(view):
-    # 로그인 안 한 사용자는 홈으로 보냄 - 다른 파트에서도 import해서 사용
+    # 로그인 안 한 사용자 처리 - 다른 파트에서도 import해서 사용
     # from views.auth_views import login_required
+    #   API(/api/... 또는 JSON 요청): {"ok": false, "error": "로그인이 필요해요."} + 401
     @wraps(view)
     def wrapped(*args, **kwargs):
         if session.get('user_id') is None:
-            return redirect(url_for('auth.index'))
+            if wants_json():
+                return fail('로그인이 필요해요.', 401)
+            return redirect(url_for('auth.index', login=1, next=request.full_path.rstrip('?')))
         return view(*args, **kwargs)
     return wrapped
+
+
+@bp.app_errorhandler(pymysql.err.OperationalError)
+def db_unavailable(error):
+    message = 'DB에 연결할 수 없어요. MySQL이 켜져 있는지, .env 설정이 맞는지 확인해 주세요.'
+    if wants_json() or request.method == 'POST':
+        return fail(message, 503)
+    return message, 503
 
 
 # 페이지
@@ -69,9 +81,58 @@ def index():
 
 
 @bp.route('/settings')
+@login_required
 def settings():
-    # 로그인 백엔드 완성 후 @login_required 추가 예정
-    return render_template('settings.html')
+    return render_template('settings.html', user=to_public(get_current_user()))
+
+
+@bp.route('/settings/profile', methods=['POST'])
+@login_required
+def update_profile():
+    data = form_data()
+    name = (data.get('name') or '').strip()
+    email = (data.get('email') or '').strip()
+    department = (data.get('department') or '').strip() or None
+    semester = (data.get('semester') or '').strip() or None
+
+    if not name or not email:
+        return fail('이름과 이메일을 입력해 주세요.')
+    if len(name) > 50 or (department and len(department) > 50) or (semester and len(semester) > 20):
+        return fail('입력한 내용이 너무 길어요.')
+    if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', email):
+        return fail('이메일 형식이 올바르지 않아요.')
+    if query('SELECT id FROM users WHERE email = %s AND id <> %s', (email, session['user_id']), one=True):
+        return fail('이미 다른 계정에서 쓰고 있는 이메일이에요.', 409)
+
+    try:
+        execute('UPDATE users SET name = %s, email = %s, department = %s, semester = %s WHERE id = %s',
+                (name, email, department, semester, session['user_id']))
+    except pymysql.err.IntegrityError:
+        return fail('이미 다른 계정에서 쓰고 있는 이메일이에요.', 409)
+    return jsonify({'ok': True, 'user': to_public(get_current_user())})
+
+
+@bp.route('/settings/password', methods=['POST'])
+@login_required
+def change_password():
+    data = form_data()
+    current = data.get('current_password') or ''
+    new = data.get('new_password') or ''
+    confirm = data.get('new_password_confirm') or ''
+
+    user = query('SELECT password_hash FROM users WHERE id = %s', (session['user_id'],), one=True)
+    if not user or not check_password_hash(user['password_hash'], current):
+        return fail('현재 비밀번호가 올바르지 않아요.', 401)
+    if len(new) < 8:
+        return fail('새 비밀번호는 8자 이상이어야 해요.')
+    if new != confirm:
+        return fail('새 비밀번호가 일치하지 않아요.')
+    if new == current:
+        return fail('현재 비밀번호와 다른 비밀번호를 입력해 주세요.')
+
+    execute('UPDATE users SET password_hash = %s WHERE id = %s',
+            (generate_password_hash(new), session['user_id']))
+    return jsonify({'ok': True})
 
 
 # 회원가입, 로그인·로그아웃
@@ -92,6 +153,8 @@ def register():
         return fail('학번은 숫자 8자리로 입력해 주세요.')
     if len(username) < 4:
         return fail('아이디는 4자 이상이어야 해요.')
+    if len(username) > 50 or len(name) > 50 or len(email) > 100:
+        return fail('입력한 내용이 너무 길어요.')
     if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+', email):
         return fail('이메일 형식이 올바르지 않아요.')
     if len(password) < 8:
@@ -109,9 +172,12 @@ def register():
             return fail('이미 가입된 학번이에요.', 409)
         return fail('이미 가입된 이메일이에요.', 409)
 
-    user_id = execute(
-        'INSERT INTO users (username, password_hash, name, student_id, email) VALUES (%s, %s, %s, %s, %s)',
-        (username, generate_password_hash(password), name, student_id, email))
+    try:
+        user_id = execute(
+            'INSERT INTO users (username, password_hash, name, student_id, email) VALUES (%s, %s, %s, %s, %s)',
+            (username, generate_password_hash(password), name, student_id, email))
+    except pymysql.err.IntegrityError:
+        return fail('이미 가입된 정보가 있어요. 아이디·학번·이메일을 확인해 주세요.', 409)
 
     session.clear()
     session['user_id'] = user_id
@@ -140,8 +206,6 @@ def login():
 @bp.route('/auth/me')
 def me():
     return jsonify({'ok': True, 'user': to_public(get_current_user())})
-
-# 작성중
 
 DOING_STATUSES = ('progress', '진행 중')
 
