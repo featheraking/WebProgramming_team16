@@ -3,6 +3,6 @@ PyMySQL>=1.1
 cryptography>=42.0   # needed by PyMySQL for MySQL 8 default auth (caching_sha2_password)
 python-dotenv>=1.0
 
-google-genai>=2.33  # tone에서 사용
-requests>=2.34       #url에서 사용
-patchright>=1.64     #url에서 사용
+google-genai>=2.33  #used by tone
+requests>=2.34       #used by url
+patchright>=1.64     #used by url
