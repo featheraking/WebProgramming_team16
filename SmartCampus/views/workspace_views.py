@@ -436,7 +436,15 @@ def get_records(pid):
         r['created_at'] = stamp(r['created_at'])
         r['updated_at'] = stamp(r['updated_at'])
         
-        children = query('SELECT * FROM project_sub_records WHERE project_id=%s AND parent_id=%s ORDER BY created_at DESC', (pid, r['id']))
+        children = query(
+            '''
+            SELECT c.*, u.name AS author_name FROM project_sub_records c
+            JOIN users u ON c.author_id = u.id
+            WHERE c.project_id = %s AND c.parent_id = %s
+            ORDER BY c.created_at DESC
+            ''',
+            (pid, r['id'])
+            )
         for c in children:
             c['edited_at'] = stamp(c['updated_at']) if c['updated_at'] != c['created_at'] else None
             c['created_at'] = stamp(c['created_at'])
