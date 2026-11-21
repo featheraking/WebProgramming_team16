@@ -3,13 +3,15 @@
 {% block title %}시험 스케줄러{% endblock %}
 
 {% block head %}
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+<style>#schedulerApp .scheduler-sync{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px;padding:14px 18px;background:#edf5f0;color:#28563c;border-radius:8px;font-size:14px}#schedulerApp .sync-error{background:#fff0e9;color:#9b3f23}#schedulerApp .scheduler-sync [hidden]{display:none!important}</style>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/exam-scheduler-team.css') }}">
 {% endblock %}
 
 {% block main_attrs %} class="page" id="schedulerApp"{% endblock %}
 
 {% block content %}
+<div id="syncStatus" class="scheduler-sync" role="status"><span id="syncText">서버 연결 준비 중…</span><button id="reloadData" type="button" hidden>다시 불러오기</button></div>
 <nav class="viewnav" aria-label="시험 스케줄러 화면"><a href="#home" data-route="home">01 <span>시험 대시보드</span></a><a href="#plan" data-route="plan">02 <span>오늘 공부 계획</span></a><a href="#focus" data-route="focus">03 <span>집중 타이머</span></a></nav>
 <div id="runningBanner" class="running-banner hidden"><span>진행 중인 공부가 있어요. 화면을 이동해도 타이머는 유지됩니다.</span><a href="#focus">타이머로 돌아가기 →</a></div>
 <section data-view="home"><div class="pagehead"><div><div class="eyebrow">MY EXAMS</div><h1 tabindex="-1">시험 대시보드</h1><p>가까운 시험부터 확인하고, 오늘의 공부를 준비하세요.</p></div><button class="primary" id="addExam">＋ 시험 등록</button></div>
@@ -23,9 +25,15 @@
 <div class="focus-layout"><section class="panel timer-stage"><span class="session-pill" id="timerState">시작 준비</span><p id="timerExam" class="muted">나만의 집중 시간</p><h2 id="timerTitle">자유 공부를 시작해 보세요</h2><div class="clock" id="clock" role="timer" aria-label="경과 공부 시간">00:00:00</div><p id="timerTarget">계획에 연결하지 않고도 공부 시간을 기록할 수 있어요.</p><div class="timer-track"><div id="timerProgress"></div></div><div class="actions"><button class="primary" id="freeStart">자유 공부 시작</button><button id="pause" disabled>일시정지</button><button class="finish-button" id="finish" disabled>공부 종료 · 결과 기록</button></div><p class="hint">일시정지한 시간은 제외됩니다. 화면 이동·새로고침 후에도 진행 상황이 유지돼요.</p></section><aside><section class="panel"><h2>이번 공부 가이드</h2><div id="timerGuide"><p>계획 화면에서 공부를 시작하면 해당 시험의 전략을 여기서 확인할 수 있어요.</p></div></section><section class="panel"><h3>집중을 돕는 작은 약속</h3><ul class="explain-list"><li>이번 범위에 필요한 자료만 펼쳐요.</li><li>막히는 부분은 표시하고 넘어가요.</li><li>끝나기 전, 핵심 내용을 떠올려 봐요.</li></ul></section><section class="panel"><h3>다음 공부</h3><p id="timerNext" class="muted">오늘 공부 계획을 먼저 만들어 보세요.</p></section></aside></div></section>
 {% endblock %}
 
-{% block scripts %}
-        <script defer src="{{ url_for('static', filename='js/planner.js') }}"></script>
-<script defer src="{{ url_for('static', filename='js/exam-scheduler.js') }}"></script><script defer src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+{% block modals %}
 <dialog class="scheduler-dialog" id="examDialog"><form id="examForm"><div class="dialoghead"><h2 id="formTitle">시험 등록</h2><button type="button" data-close="examDialog" aria-label="닫기">×</button></div><input type="hidden" id="examId"><label class="field">시험명<input id="examName" required maxlength="100" placeholder="예: 정보기기운용기능사 필기"></label><div class="formgrid"><label class="field">시험 날짜<input id="examDate" type="date" required></label><label class="field">시험 시간<input id="examTime" type="time" required value="13:00"></label></div><fieldset><legend>문제 형식 (복수 선택 가능)</legend><div class="checks"><label><input type="checkbox" name="format" value="객관식">객관식</label><label><input type="checkbox" name="format" value="단답형">단답형</label><label><input type="checkbox" name="format" value="서술형">서술형</label></div></fieldset><fieldset><legend>학습 특성 (복수 선택 가능)</legend><div class="checks"><label><input type="checkbox" name="trait" value="문제은행형">문제은행형</label><label><input type="checkbox" name="trait" value="암기형">암기형</label><label><input type="checkbox" name="trait" value="계산형">계산형</label><label><input type="checkbox" name="trait" value="개념형">개념형</label></div></fieldset><label class="field">현재 전체 준비 상태<select id="readiness"><option value="0">시작 안 함</option><option value="1">조금 공부함</option><option value="2">많이 공부함</option></select></label><h3>시험 범위와 공부 상태</h3><p class="hint">한 번에 공부할 수 있는 작은 단위로 나눠 주세요.</p><div id="scopeRows"></div><button type="button" id="addScope">＋ 범위 추가</button><div class="dialogfoot"><button type="button" data-close="examDialog">취소</button><button type="submit" class="primary">저장하기</button></div></form></dialog>
 <dialog class="scheduler-dialog" id="resultDialog"><form id="resultForm"><h2>수고했어요! 공부 결과를 기록해요.</h2><p id="resultSummary"></p><div id="resultStatus"><p>공부한 범위를 지금 얼마나 이해했나요?</p><div class="choice"><label><input type="radio" name="status" value="unknown" checked>🔴 모름</label><label><input type="radio" name="status" value="unsure">🟡 애매함</label><label><input type="radio" name="status" value="done">🟢 완료</label></div></div><p class="hint">저장한 공부 시간과 상태는 다음 계획에 반영돼요.</p><div class="dialogfoot"><button type="submit" class="primary">결과 저장</button></div></form></dialog><div class="message hidden" id="message" role="status"></div>
+
+{% endblock %}
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/scheduler-api.js') }}"></script>
+
+        <script defer src="{{ url_for('static', filename='js/planner.js') }}"></script>
+<script defer src="{{ url_for('static', filename='js/exam-scheduler.js') }}"></script><script defer src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+
 {% endblock %}
