@@ -2,41 +2,7 @@
 import { apiRequest, getProjectId, getCurrentDateTime, currentUserId, Users } from "./workspace_utils.js";
 
 
-
-
-
-// 임시 데이터
-/*
-const initialRecords = [
-    {
-        id: "record1",
-        title: "테스트 기록 A",
-        content: "테스트 기록 내용 A",
-        authorId: "user1",
-        createdAt: "2026-11-04 10:00",
-        isHidden: false,
-        history: [],
-        children: [
-            { id: "child3", authorId: "user3", content: "숨겨진 기록", createdAt: "2026-11-01 17:30", isHidden: true, editedAt: "2026-11-04 19:00" },
-            { id: "child2", authorId: "user1", content: "A의 기록", createdAt: "2026-11-01 10:30", isHidden: false, editedAt: null },
-            { id: "child1", authorId: "user2", content: "B의 기록", createdAt: "2026-11-01 11:00", isHidden: false, editedAt: null }
-        ]
-    },
-    {
-        id: "record2",
-        title: "테스트 기록 B",
-        content: "테스트 기록 내용 B",
-        authorId: "user2",
-        createdAt: "2026-11-03 09:00",
-        isHidden: false,
-        history: [],
-        children: []
-    }
-];
-*/
-
 // 저장/불러오기 및 기본 유틸리티
-//let records = structuredClone(initialRecords);
 let records = [];
 
 let openRecordId = null;
@@ -47,6 +13,9 @@ const recordPageSize = 4; // 하위 기록을 펼칠 때 끊어서 보여주는 
 
 // 기존 변수명과 호환하기 위하 함수
 function normalizeRecord(row) {
+    // 프로젝트에 더 이상 존재하지 않는 참여자에 대해 id로만 표기되는 것 방지
+    Users[row.author_id] = row.author_name;
+
     return {
         id: row.id,
         title: row.title,
@@ -57,14 +26,19 @@ function normalizeRecord(row) {
 
         history: [],
 
-        children: (row.children ?? []).map(child => ({
-            id: child.id,
-            authorId: child.author_id,
-            content: child.content,
-            createdAt: child.created_at,
-            editedAt: child.edited_at,
-            isHidden: Boolean(child.is_hidden)
-        }))
+        children: (row.children ?? []).map(child => {
+            // 프로젝트에 더 이상 존재하지 않는 참여자에 대해 id로만 표기되는 것 방지
+            Users[child.author_id] = child.author_name;
+
+            return {
+                id: child.id,
+                authorId: child.author_id,
+                content: child.content,
+                createdAt: child.created_at,
+                editedAt: child.edited_at,
+                isHidden: Boolean(child.is_hidden)
+            };
+        })
     };
 }
 
@@ -303,19 +277,6 @@ createRecordForm.addEventListener("submit", async event => {
     const title = document.getElementById("recordTitle").value.trim();
     const content = document.getElementById("recordContent").value.trim();
 
-    /*
-    records.push({
-        id: crypto.randomUUID(),
-        title: title,
-        content: content,
-        authorId: currentUserId,
-        createdAt: getCurrentDateTime(true),
-        isHidden: false,
-        history: [],
-        children: []
-    });
-    */
-
     try {
         await apiRequest(`/workspace/api/projects/${getProjectId()}/records`,
             {
@@ -340,7 +301,6 @@ createRecordForm.addEventListener("submit", async event => {
     }
 
     // 목록 갱신
-    //renderRecordList();
     try {
         await loadRecords();
     }
@@ -399,11 +359,6 @@ document.getElementById("editRecordForm").addEventListener("submit", async event
             );
         }
 
-        // 수정 반영
-        //record.title = title;
-        //record.content = content;
-        //record.isHidden = isHidden;
-
         bootstrap.Modal.getInstance(editRecordModal)?.hide();
     }
     catch (error) {
@@ -439,7 +394,6 @@ async function openHistoryModal(record) {
 
     list.replaceChildren();
 
-    //const history = [...(record.history ?? [])].reverse();
     const history = await loadRecordHistory(record.id);
 
     if (history.length === 0) {
@@ -515,16 +469,6 @@ recordList.addEventListener("click", async event => {
             return;
         }
 
-        /*
-        record.children ??= [];
-        record.children.push({
-            id: crypto.randomUUID(),
-            authorId: currentUserId,
-            content: content,
-            createdAt: getCurrentDateTime(true),
-            editedAt: null,
-            isHidden: false
-        });*/
         try {
             await apiRequest(`/workspace/api/projects/${getProjectId()}/records/${record.id}/children`,
                 {
@@ -548,7 +492,6 @@ recordList.addEventListener("click", async event => {
         }
 
         // 목록 갱신
-        //renderRecordList();
         try {
             await loadRecords();
         }
@@ -604,7 +547,7 @@ recordList.addEventListener("click", async event => {
         edit.classList.add("d-none");
         view.classList.remove("d-none");
         return;
-    }
+    }   
 
     // 하위 기록 수정 저장
     if (action === "save-child") {
@@ -628,12 +571,6 @@ recordList.addEventListener("click", async event => {
                 }
             );
 
-            // 수정 시각 갱신
-            /*
-            if (child.content !== content) {
-                child.content = content;
-                child.editedAt = getCurrentDateTime(true);
-            }*/
         }
         catch (error) {
             alert("수정에 실패했습니다." + `\n${error.message}`);
@@ -644,7 +581,6 @@ recordList.addEventListener("click", async event => {
         }
 
         // 목록 갱신
-        //renderRecordList();
         try {
             await loadRecords();
         }
@@ -657,8 +593,6 @@ recordList.addEventListener("click", async event => {
 
     // 하위 기록 숨김/숨김 해제
     if (action === "toggle-child-hidden") {
-        //child.isHidden = !child.isHidden;
-
         try {
             await apiRequest(
                 `/workspace/api/projects/${getProjectId()}/children/${child.id}/hidden`,
@@ -677,7 +611,6 @@ recordList.addEventListener("click", async event => {
 
 
         // 목록 갱신
-        //renderRecordList();
         try {
             await loadRecords();
         }

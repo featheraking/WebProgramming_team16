@@ -3,21 +3,6 @@ import { apiRequest, getProjectId, generateInviteCode, loadCurrentUser, currentU
 import { loadTasks, setAssigneeOptions } from "./task.js";
 import { loadRecords } from "./record.js";
 
-/* 프로젝트 임시 데이터 */
-/*
-const currentProject = {
-    id: crypto.randomUUID(),
-    name: "테스트 프로젝트명(임시)",
-    description: "프로젝트 설명입니다.",
-    createdAt: "2026-11-01",
-    dueDate: "2026-12-31",
-    adminId: "user1",
-    inviteCode: "ABCD1234",
-    currentMembers: ["user1", "user2", "user3", "user4"],
-    maxMembers: 5,
-    taskCount: 0
-};
-*/
 
 let currentProject = null;
 
@@ -193,7 +178,6 @@ projectSettingsForm.addEventListener("submit", async event => {
     }
 
     // 프로젝트 화면 갱신
-    //renderProjectInfo();
     try {
         await loadProjectInfo();
     }
@@ -286,7 +270,6 @@ projectMemberList.addEventListener("click", async event => {
 
     try {
         // 관리자 변경
-        //currentProject.adminId = targetUserId;
         await apiRequest(`/workspace/api/projects/${currentProject.id}/owner`,
             {
                 method: "PATCH",
@@ -304,7 +287,6 @@ projectMemberList.addEventListener("click", async event => {
     alert(`'${targetMember.name}'님에게 관리자 권한을 양도했습니다.`);
 
     // 인원 관리 화면 갱신
-    //renderProjectMembers();
     try {
         await loadProjectInfo();
     }
@@ -427,7 +409,6 @@ document.getElementById("regenerateProjectInviteCode").addEventListener("click",
 
         try {
             // 초대 코드 갱신
-            //currentProject.inviteCode = newCode;
             await apiRequest(`/workspace/api/projects/${currentProject.id}/invite-code`, {
                 method: "POST",
                 body: JSON.stringify({
@@ -447,7 +428,6 @@ document.getElementById("regenerateProjectInviteCode").addEventListener("click",
 
     // 목록 갱신
     try {
-        //renderInviteCode();
         await loadProjectInfo();
     }
     catch (error) {
@@ -480,7 +460,6 @@ document.getElementById("confirmLeaveProject").addEventListener("click", async (
 
     window.location.href = "/workspace";
 });
-
 
 
 

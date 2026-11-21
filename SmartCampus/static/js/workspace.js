@@ -2,24 +2,6 @@
 import { apiRequest, generateInviteCode, getCurrentDateTime, currentUserId, loadCurrentUser } from "./workspace_utils.js";
 
 
-// 임시 프로젝트 데이터
-/*
-const projects = [
-    {
-        id: crypto.randomUUID(),
-        name: "테스트 프로젝트명(임시)",
-        description: "프로젝트 설명입니다.",
-        createdAt: "2026-11-01",
-        dueDate: "2026-12-31",
-        adminId: "user1",
-        inviteCode: "ABCD1234",
-        currentMembers: ["user1", "user2", "user3", "user4"],
-        maxMembers: 5,
-        taskCount: 0
-    }
-];*/
-
-
 let projects = [];
 
 // 기존 변수명들과 호환하기 위한 함수
@@ -135,7 +117,6 @@ createProjectForm.addEventListener("submit", async event => {
 
     // 목록 갱신
     try {
-        // renderProjects();
         await loadProjects();
     }
     catch (error) {
@@ -262,7 +243,6 @@ function renderProjects() {
 
 
 
-
 // 프로젝트 검색 & 필터 이벤트
 document.getElementById("projectSearch").addEventListener("input", renderProjects);
 
@@ -280,6 +260,7 @@ document.getElementById("resetProjectFilters").addEventListener("click", () => {
 
     renderProjects();
 });
+
 
 
 // 초기 렌더링

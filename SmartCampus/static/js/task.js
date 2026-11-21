@@ -22,52 +22,15 @@ const statusColors = {
 };
 
 
-// 임시 데이터
-/*
-const tasks = [
-    {
-        id: crypto.randomUUID(),
-        creatorId: "user1",
-        title: "테스트 과제 A",
-        description: "테스트 과제 A의 상세 내용",
-        assignees: ["user1", "user2"],
-        status: "done",
-        createdAt: "2019-12-31",
-        dueDate: "2029-12-31",
-        isActive: true,
-        notes: {}
-    },
-    {
-        id: crypto.randomUUID(),
-        creatorId: "user3",
-        title: "테스트 과제 B",
-        description: "테스트 과제 B의 상세 내용",
-        assignees: ["user3"],
-        status: "todo",
-        createdAt: "2039-12-31",
-        dueDate: "2049-12-31",
-        isActive: true,
-        notes: {}
-    },
-    {
-        id: crypto.randomUUID(),
-        creatorId: "user4",
-        title: "테스트 과제 C",
-        description: "테스트 과제 C의 상세 내용",
-        assignees: ["user4"],
-        status: "progress",
-        createdAt: "2008-12-31",
-        dueDate: "2009-12-31",
-        isActive: true,
-        notes: {}
-    }
-];
-*/
 
 let tasks = [];
 
 // 기존 변수명과 호환하기 위한 함수
 function normalizeTask(row) {
+    // 프로젝트에 더 이상 존재하지 않는 참여자에 대해 id로만 표기되는 것 방지
+    for (const member of row.assignees) 
+        Users[member.user_id] = member.name;
+    
     return {
         id: row.id,
         creatorId: row.created_by,
@@ -290,9 +253,6 @@ createTaskForm.addEventListener("submit", async event => {
         createTaskForm.reset();
 
         // Modal 닫기
-        //const modalElement = document.getElementById("createTaskModal");
-        //const modal = bootstrap.Modal.getInstance(modalElement);
-        //modal.hide();
         bootstrap.Modal.getInstance(document.getElementById("createTaskModal")).hide();
     }
     catch (error) {
