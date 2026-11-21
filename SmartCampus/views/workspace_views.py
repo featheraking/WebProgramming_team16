@@ -300,7 +300,15 @@ def get_tasks(pid):
         t['created_date'] = day(t['created_date'])
         t['due_date'] = day(t['due_date'])
         t['is_active'] = bool(t['is_active'])
-        t['assignees'] = query('SELECT user_id,comment FROM task_assignees WHERE task_id=%s', (t['id'],))
+        
+        # 프로젝트에 더 이상 존재하지 않는 참여자에 대해 id로만 표기되는 것 방지
+        t['assignees'] = query(
+            '''
+            SELECT a.user_id, a.comment, u.name FROM task_assignees a
+            JOIN users u ON a.user_id = u.id WHERE a.task_id = %s
+            ''',
+            (t['id'],)
+        )
     
     return jsonify(rows)
 
@@ -321,8 +329,10 @@ def create_task(pid):
     conn = get_db()
     try:
         conn.begin()
-        execute('''INSERT INTO project_tasks(id,project_id,title,content,created_by,due_date,status)
-                   VALUES(%s,%s,%s,%s,%s,%s,'todo')''',
+        execute('''
+                INSERT INTO project_tasks(id,project_id,title,content,created_by,due_date,status)
+                VALUES(%s,%s,%s,%s,%s,%s,'todo')
+                ''',
                 (d['id'], pid, d['title'], d.get('content', ''), uid, d.get('due_date')))
         
         for member in ids:
@@ -359,8 +369,11 @@ def update_task(pid, tid):
     conn = get_db()
     try:
         conn.begin()
-        execute('''UPDATE project_tasks SET title=%s,content=%s,due_date=%s,status=%s,is_active=%s
-                   WHERE id=%s AND project_id=%s''',
+        execute('''
+                UPDATE project_tasks
+                SET title=%s,content=%s,due_date=%s,status=%s,is_active=%s
+                WHERE id=%s AND project_id=%s
+                ''',
                 (d['title'], d.get('content', ''), d.get('due_date'), d['status'], bool(d.get('is_active', True)), tid, pid))
         
         if ids:
@@ -386,8 +399,13 @@ def update_task_memo(pid, tid):
     if error:
         return error
     
-    if not query('''SELECT 1 FROM task_assignees a JOIN project_tasks t ON t.id=a.task_id
-                    WHERE a.task_id=%s AND a.user_id=%s AND t.project_id=%s''', (tid, uid, pid), one=True):
+    if not query('''
+                SELECT 1 FROM task_assignees a
+                JOIN project_tasks t ON t.id=a.task_id
+                WHERE a.task_id=%s AND a.user_id=%s AND t.project_id=%s
+                ''',
+                (tid, uid, pid), one=True
+                ):
         return api_error('담당자만 자신의 메모를 수정할 수 있습니다.', 403)
     
     d = request.get_json() or {}
@@ -406,7 +424,14 @@ def get_records(pid):
     if error:
         return error
     
-    rows = query('SELECT * FROM project_records WHERE project_id=%s ORDER BY created_at DESC', (pid,))
+    rows = query(
+        '''
+        SELECT r.*, u.name AS author_name FROM project_records r
+        JOIN users u ON r.author_id = u.id
+        WHERE r.project_id = %s
+        ORDER BY r.created_at DESC
+        ''',
+        (pid,))
     for r in rows:
         r['created_at'] = stamp(r['created_at'])
         r['updated_at'] = stamp(r['updated_at'])
