@@ -24,10 +24,51 @@ def scan():
     except requests.RequestException:
         return jsonify({'error': '사이트에 접속할 수 없어요.'}), 502
 
+    screens = []                                              # 크롬이 실제로 보여 준 화면들
+    with sync_playwright() as p:                              # 패치라이트 시작 (끝나면 알아서 정리됨)
+        browser = p.chromium.launch(channel='chrome', chromium_sandbox=True, headless=False,   # 샌드박스 모드로 보안 강화, 광고가 검사 프로그램을 알아채지 못하게 보통 크롬 창으로 켬
+                                    args=['--window-position=-3000,-3000',              # 창은 화면 밖에 띄움
+                                          '--disable-backgrounding-occluded-windows',   # 창이 안 보여도 화면을 계속 그리게 함
+                                          '--disable-renderer-backgrounding',
+                                          '--disable-background-timer-throttling'])
+        page = browser.new_page(viewport={'width': 1280, 'height': 720}, accept_downloads=False)  # 새 탭 열 때 다운로드를 차단함
+        try:
+            try:
+                page.goto(url, timeout=10000, wait_until='commit')  # 처음 주소로 한 번만 이동, 들어가자마자 바로 지켜보기 시작
+            except TimeoutError:
+                pass
+            last = ''                                             # 마지막으로 찍은 주소
+            still = 0                                             # 주소가 안 바뀐 채로 지난 시간
+            while still < 3000 and len(screens) < 10:             # 3초 동안 안 바뀌면 도착지로 보고 끝, 최대 10장
+                if page.url != last:                              # 주소가 바뀌었으면 화면이 그려질 틈을 조금 주고 찍음
+                    page.wait_for_timeout(300)
+                    last = page.url
+                    try:
+                        shot = page.context.new_cdp_session(page).send('Page.captureScreenshot', {'format': 'jpeg', 'quality': 60})
+                    except Exception:                             # 화면이 아직 덜 그려졌으면 0.5초 뒤 한 번 더
+                        page.wait_for_timeout(500)
+                        shot = page.context.new_cdp_session(page).send('Page.captureScreenshot', {'format': 'jpeg', 'quality': 60})
+                    screens.append({'url': last, 'image': shot['data']})  # 크롬이 찍어 준 사진 (이미 글자로 바뀌어 있음)
+                    still = 0
+                page.wait_for_timeout(200)                        # 0.2초마다 주소가 바뀌었는지 확인
+                still += 200
+            try:
+                page.wait_for_load_state(timeout=10000)           # 도착지가 다 뜰 때까지 기다렸다가
+            except TimeoutError:
+                pass
+            shot = page.context.new_cdp_session(page).send('Page.captureScreenshot', {'format': 'jpeg', 'quality': 60})
+            screens[-1] = {'url': page.url, 'image': shot['data']}  # 마지막 사진은 다 뜬 화면으로 다시 찍음
+        except Exception:
+            if not screens:                                       # 한 장도 못 찍었으면 실패 사진 한 장
+                screens.append({'url': url, 'image': None})
+        browser.close()
+
     redirects = []                                # 거쳐 가는 주소 목록
     lastUrl = ''                                   # 바로 앞 주소 (비교용)
-    for step in response.history + [response]:    # 중간에 거친 답들 + 마지막 답
-        host = step.url.split('/')[2]            # 사이트 이름
+    addresses = [step.url for step in response.history + [response]]   # 서버가 넘긴 주소들 (중간에 거친 답들 + 마지막 답)
+    addresses += [screen['url'] for screen in screens[1:] if screen['url'].startswith('http')]   # 크롬이 자바스크립트로 더 넘어간 주소들
+    for address in addresses:                     # 지나간 모든 주소마다
+        host = address.split('/')[2].split(':')[0]   # 사이트 이름 (:5000 같은 포트 번호는 뗌)
         thisUrl = host.removeprefix('www.')         # 비교용
         if thisUrl == lastUrl:
             redirects.pop()                       # 앞 줄과 같은 주소면 앞 줄을 버림
@@ -48,7 +89,7 @@ def scan():
                     info = {'country': '확인 실패'}
         except (requests.RequestException, socket.gaierror):   #  연결이 안 됨
             info = {'country': '연결 실패'}
-        redirects.append({'url': step.url, 'country': info.get('country', '-'), 'company': info.get('isp', '-'), 'proxy': info.get('proxy', False)})    
+        redirects.append({'url': address, 'country': info.get('country', '-'), 'company': info.get('isp', '-'), 'proxy': info.get('proxy', False)})    
         lastUrl = thisUrl                              # 다음 url로 이동
 
     disposition = response.headers.get('Content-Disposition', '')  # 서버가 파일을 저장하려고 했는지
@@ -77,18 +118,4 @@ def scan():
             danger = '확인 불가'
     except requests.RequestException:
         danger = '연결 실패'                            #구글 api에 연결 실패
-    with sync_playwright() as p:                              # 패치라이트 시작 (끝나면 알아서 정리됨)
-        browser = p.chromium.launch(channel='chrome', chromium_sandbox=True)         # 깔려 있는 크롬을 화면 없이 켬, 샌드박스 모드로 보안 강화
-        page = browser.new_page(viewport={'width': 1280, 'height': 720}, accept_downloads=False)  # 새 탭 열 때 다운로드를 차단함
-        for redirect in redirects:                            # 남은 주소마다 한 장씩
-            try:
-                try:
-                    page.goto(redirect['url'], timeout=10000)     # 그 주소로 이동
-                except TimeoutError:                              # 10초 안에 다 안 떠도 뜬 데까지 찍으러 감
-                    pass
-                shot = page.context.new_cdp_session(page).send('Page.captureScreenshot', {'format': 'jpeg', 'quality': 60})
-                redirect['image'] = shot['data']                  # 크롬이 찍어 준 사진 (이미 글자로 바뀌어 있음)
-            except Exception:                                 
-                redirect['image'] = None
-        browser.close()                                      
-    return jsonify({'redirects': redirects, 'download': download, 'danger': danger})
+    return jsonify({'redirects': redirects, 'download': download, 'danger': danger, 'screens': screens})

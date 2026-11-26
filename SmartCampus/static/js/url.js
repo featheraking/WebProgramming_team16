@@ -66,27 +66,29 @@ scanButton.addEventListener('click', () => { //검사하기 버튼 클릭시 결
             redirectCount.textContent = result.redirects.length;
             redirectList.innerHTML = '';                 // 내용 초기화
             screenshotList.innerHTML = '';               //  스크린샷 초기화
-            result.redirects.forEach((redirect, index) => {       // 주소를 서버한테 받은 뒤에 html li로 만들고, 스크린샷도 돌면서 찍음
+            result.redirects.forEach((redirect) => {       // 주소를 서버한테 받은 뒤에 html li로 만듦
                 const li = document.createElement('li');
-                const item = document.createElement('div');    
-                if (index === 0) {                                               
+                li.innerHTML = '<div class="d-flex justify-content-between"><span></span><span></span></div>';
+                const spans = li.querySelectorAll('span');
+                spans[0].textContent = redirect.url;     // 왼쪽 칸: 주소
+                spans[1].textContent = redirect.country + ' · ' + redirect.company + (redirect.proxy ? ' [프록시]' : '');  // 오른쪽 칸: 나라, 회사 이름, 프록시 서버 여부
+                redirectList.appendChild(li);            // 목록에 붙이기
+            });
+            result.screens.forEach((screen, index) => {       // 크롬이 실제로 보여 준 화면마다 사진 한 장
+                const item = document.createElement('div');
+                if (index === 0) {
                     item.className = 'carousel-item active';   // 첫 번째 페이지라면 active를 붙여서 부트스트랩이 가장 앞에 띄우도록 함
                 } else {
                     item.className = 'carousel-item';
                 }
-                if (redirect.image) {                                            // 사진이 있으면 사진을 출력함
+                if (screen.image) {                                              // 사진이 있으면 사진을 출력함
                     item.innerHTML = '<img class="screenshot-image"><div class="text-muted mt-2 text-center"></div>';
-                    item.querySelector('img').src = 'data:image/jpeg;base64,' + redirect.image;
+                    item.querySelector('img').src = 'data:image/jpeg;base64,' + screen.image;
                 } else {                                                         // 없으면 안내 문구를 띄움
                     item.innerHTML = '<div class="screenshot-box">사이트 화면 촬영을 실패했어요</div><div class="text-muted mt-2 text-center"></div>';
                 }
-                item.querySelector('.text-center').textContent = redirect.url;   // 사진 아래에 주소를 넣음
-                screenshotList.appendChild(item);                               
-                li.innerHTML = '<div class="d-flex justify-content-between"><span></span><span></span></div>';
-                const spans = li.querySelectorAll('span');
-                spans[0].textContent = redirect.url;     // 왼쪽 칸: 주소
-                spans[1].textContent = redirect.country + ' · ' + redirect.company + (redirect.proxy ? ' [프록시]' : '');  // 오른쪽 칸: 나라, 회사 이름, 프록시 서버 여부 
-                redirectList.appendChild(li);            // 목록에 붙이기
+                item.querySelector('.text-center').textContent = screen.url;     // 사진 아래에 주소를 넣음
+                screenshotList.appendChild(item);
             });
             downloadName.textContent = result.download ? result.download.name : '-';
             downloadKind.textContent = result.download ? result.download.kind : '-';

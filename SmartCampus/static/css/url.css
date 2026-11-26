@@ -137,3 +137,16 @@
     border: 1px solid #ced4da;
     border-radius: 8px;
 }
+
+.redirect-list span:first-child,
+.screenshot-list .text-center {   /* 긴 주소는 한 줄로 자르고 끝에 ... 표시 */
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.redirect-list span:last-child {  /* 나라 · 회사 칸은 줄어들지 않게 */
+    flex-shrink: 0;
+    margin-left: 16px;
+}
